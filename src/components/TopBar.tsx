@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/login/actions'
+import Link from 'next/link'
 
 export default async function TopBar() {
   const supabase = await createClient()
@@ -29,8 +30,12 @@ export default async function TopBar() {
             {balance.toFixed(2)} <span className="text-lg">PLN</span>
           </span>
         </div>
-        <div className="flex gap-4 items-center">
-          <span className="text-sm text-muted-foreground hidden sm:inline-block max-w-[200px] truncate">
+        <div className="flex gap-6 items-center">
+          <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
+            <Link href="/" className="hover:text-primary transition-colors">Kokpit</Link>
+            <Link href="/settings" className="hover:text-primary transition-colors">Ustawienia</Link>
+          </nav>
+          <span className="text-sm text-muted-foreground hidden sm:inline-block max-w-[200px] truncate border-l border-border pl-4">
             {user?.email}
           </span>
           <form action={logout}>
