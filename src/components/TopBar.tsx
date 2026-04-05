@@ -33,6 +33,8 @@ export default async function TopBar() {
         <div className="flex gap-6 items-center">
           <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
             <Link href="/" className="hover:text-primary transition-colors">Kokpit</Link>
+            <Link href="/transactions" className="hover:text-primary transition-colors">Transakcje</Link>
+            <Link href="/analytics" className="hover:text-primary transition-colors">Analityka</Link>
             <Link href="/settings" className="hover:text-primary transition-colors">Ustawienia</Link>
           </nav>
           <span className="text-sm text-muted-foreground hidden sm:inline-block max-w-[200px] truncate border-l border-border pl-4">
