@@ -12,15 +12,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Edit2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { TransactionForm } from './transaction-form'
 
-// Adjust type according to Supabase generated one or what is retrieved
+type Category = {
+  id: string
+  name: string
+  color: string | null
+}
+
 type Transaction = {
   id: string
   amount: number
   type: string
   description: string
   date: string
+  category_id?: string | null
   categories?: {
     id: string
     name: string
@@ -30,10 +38,12 @@ type Transaction = {
 
 interface TransactionsTableProps {
   transactions: Transaction[]
+  categories: Category[]
 }
 
-export function TransactionsTable({ transactions }: TransactionsTableProps) {
+export function TransactionsTable({ transactions, categories }: TransactionsTableProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   async function handleDelete(id: string) {
     if (!confirm('Czy na pewno chcesz usunąć tę transakcję?')) return
@@ -66,7 +76,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
             <TableHead>Opis</TableHead>
             <TableHead>Kategoria</TableHead>
             <TableHead className="text-right">Kwota</TableHead>
-            <TableHead className="w-[80px]"></TableHead>
+            <TableHead className="w-[120px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,7 +102,39 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
               <TableCell className={`text-right font-bold ${transaction.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
                 {transaction.type === 'income' ? '+' : '-'}{transaction.amount.toFixed(2)} PLN
               </TableCell>
-              <TableCell>
+              <TableCell className="flex justify-end gap-2">
+                <Dialog open={editingId === transaction.id} onOpenChange={(open) => !open && setEditingId(null)}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-primary"
+                      onClick={() => setEditingId(transaction.id)}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Edytuj transakcję</DialogTitle>
+                      <DialogDescription>
+                        Wprowadź zmiany do transakcji.
+                      </DialogDescription>
+                    </DialogHeader>
+                    {/* The open check ensures initialData is loaded properly */}
+                    {editingId === transaction.id && (
+                      <TransactionForm
+                        categories={categories}
+                        initialData={{
+                          ...transaction,
+                          category_id: transaction.categories?.id || null
+                        }}
+                        onSuccess={() => setEditingId(null)}
+                      />
+                    )}
+                  </DialogContent>
+                </Dialog>
+
                 <Button
                   variant="ghost"
                   size="icon"

@@ -97,3 +97,38 @@ export async function getCategories() {
 
   return data
 }
+
+export async function updateTransaction(id: string, formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const amount = parseFloat(formData.get('amount') as string)
+  const type = formData.get('type') as 'income' | 'expense'
+  const category_id = formData.get('category_id') as string | null
+  const description = formData.get('description') as string
+  const date = formData.get('date') as string
+
+  const { error } = await supabase
+    .from('transactions')
+    .update({
+      amount,
+      type,
+      category_id: category_id || null,
+      description,
+      date
+    })
+    .eq('id', id)
+    .eq('user_id', user.id)
+
+  if (error) {
+    console.error('Error updating transaction:', error)
+    return { error: 'Failed to update transaction' }
+  }
+
+  revalidatePath('/transactions')
+  return { success: true }
+}

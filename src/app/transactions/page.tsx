@@ -36,7 +36,7 @@ export default async function TransactionsPage() {
           </Dialog>
         </div>
 
-        <TransactionsTable transactions={transactions} />
+        <TransactionsTable transactions={transactions} categories={categories} />
       </main>
     </div>
   )
