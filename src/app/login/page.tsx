@@ -5,7 +5,11 @@ import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import Link from 'next/link'
 
-export default function LoginPage() {
+interface Props {
+  searchParams: { error?: string, message?: string }
+}
+
+export default function LoginPage({ searchParams }: Props) {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-64px)] p-4">
       <Card className="w-full max-w-md bg-card shadow-xl border-border/50 backdrop-blur-sm bg-card/90">
@@ -16,6 +20,16 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {searchParams?.error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-md text-sm text-red-500 font-medium text-center">
+              {searchParams.error}
+            </div>
+          )}
+          {searchParams?.message && (
+            <div className="p-3 bg-green-500/10 border border-green-500/50 rounded-md text-sm text-green-500 font-medium text-center">
+              {searchParams.message}
+            </div>
+          )}
           <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

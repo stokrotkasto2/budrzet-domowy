@@ -15,7 +15,7 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/login?error=Invalid email or password')
+    redirect('/login?error=Nieprawidłowy adres email lub hasło.')
   }
 
   revalidatePath('/', 'layout')
@@ -39,11 +39,11 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    redirect('/register?error=Could not authenticate user')
+    redirect('/register?error=Nie udało się utworzyć konta. Być może użytkownik już istnieje lub hasło jest za słabe.')
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/login?message=Konto utworzone pomyślnie! Spróbuj się teraz zalogować.')
 }
 
 export async function loginWithGoogle() {
