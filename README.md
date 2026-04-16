@@ -53,9 +53,4 @@ w ciemnym tle dodaj małe białe stokrotki jako delikatny wzór tła
 
 ## technologia
 - next.js
-- tailwind css
-- typescript
-- supabase
-- shadcn ui
-
-zrób w tak zeby było dla ciebie najlepiej i zeby latwo bylo dodawac nowe funkcje
+- i baze dazych w dockerze
