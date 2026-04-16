@@ -90,8 +90,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.5 0.15 160);
+  --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -123,6 +123,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+  }
+  .dark body {
+    background-color: var(--background);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='3' fill='%23fbbf24'/%3E%3Cpath d='M30 22.5A2.5 2.5 0 0 1 30 15a2.5 2.5 0 0 1 0 7.5zm0 15a2.5 2.5 0 0 1 0 7.5 2.5 2.5 0 0 1 0-7.5zm-7.5-7.5a2.5 2.5 0 0 1-7.5 0 2.5 2.5 0 0 1 7.5 0zm15 0a2.5 2.5 0 0 1 7.5 0 2.5 2.5 0 0 1-7.5 0zm-10.6-5.3a2.5 2.5 0 0 1-5.3-5.3 2.5 2.5 0 0 1 5.3 5.3zm10.6 10.6a2.5 2.5 0 0 1 5.3 5.3 2.5 2.5 0 0 1-5.3-5.3zm0-10.6a2.5 2.5 0 0 1 5.3-5.3 2.5 2.5 0 0 1-5.3 5.3zm-10.6 10.6a2.5 2.5 0 0 1-5.3 5.3 2.5 2.5 0 0 1 5.3-5.3z' fill='%23ffffff'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 80px 80px;
   }
   html {
     @apply font-sans;
