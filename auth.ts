@@ -30,15 +30,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: credentials.email as string }
         })
 
-        // W prawdziwej aplikacji sprawdzalibyśmy bcrypt.compare().
-        // Tutaj dla prostoty (zanim dodamy panel rejestracji i szyfrowanie),
-        // robimy mockową weryfikację jeśli poświadczenia nie pasują.
-        if (!user) {
-          throw new Error("Nie znaleziono użytkownika.")
+        // Sprawdzenie hasła używając bcrypt
+        const isValidPassword = await bcrypt.compare(credentials.password as string, user.password || "");
+
+        if (!isValidPassword) {
+          throw new Error("Nieprawidłowe hasło.");
         }
 
-        // Zakładamy, że hasło jest trzymane w koncie 'Account' lub osobnym polu 'password' (musimy to dodać do schematu Prisma lub traktować to jako placeholder).
-        // Na ten moment zwracamy null dopóki nie utworzymy rejestracji.
         return user
       }
     })
