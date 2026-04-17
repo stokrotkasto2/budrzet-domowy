@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [passwordRepeat, setPasswordRepeat] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +24,12 @@ export default function LoginPage() {
 
     try {
       if (isRegistering) {
+        if (password !== passwordRepeat) {
+          setError("Podane hasła nie są identyczne!")
+          setLoading(false)
+          return
+        }
+
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -106,6 +113,20 @@ export default function LoginPage() {
               />
             </div>
             
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="passwordRepeat">Powtórz hasło</Label>
+                <Input 
+                  id="passwordRepeat" 
+                  type="password" 
+                  required 
+                  className="bg-background/50" 
+                  value={passwordRepeat}
+                  onChange={(e) => setPasswordRepeat(e.target.value)}
+                />
+              </div>
+            )}
+            
             {error && <p className="text-sm text-destructive font-medium text-center">{error}</p>}
             
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" disabled={loading}>
@@ -141,6 +162,7 @@ export default function LoginPage() {
               onClick={() => {
                 setIsRegistering(!isRegistering)
                 setError("")
+                setPasswordRepeat("")
               }}
             >
               {isRegistering ? "Zaloguj się" : "Zarejestruj się"}
