@@ -30,9 +30,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: credentials.email as string }
         })
 
+        if (!user) {
+          throw new Error("Nie znaleziono użytkownika.")
+        }
+
         // Sprawdzenie hasła używając bcrypt
         const isValidPassword = await bcrypt.compare(credentials.password as string, user.password || "");
-
         if (!isValidPassword) {
           throw new Error("Nieprawidłowe hasło.");
         }

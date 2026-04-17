@@ -1,30 +1,115 @@
+"use client"
+
+import { useState } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const [isRegistering, setIsRegistering] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
+    try {
+      if (isRegistering) {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        })
+        const data = await res.json()
+
+        if (!res.ok) {
+          throw new Error(data.error || "Wystąpił błąd przy rejestracji.")
+        }
+        
+        // Zaloguj od razu po rejestracji
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        })
+
+        if (result?.error) throw new Error(result.error)
+        router.push("/")
+        router.refresh()
+      } else {
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        })
+
+        if (result?.error) throw new Error("Nieprawidłowe dane logowania.")
+        router.push("/")
+        router.refresh()
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/" })
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border-border/50 shadow-2xl">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">Zaloguj się</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            {isRegistering ? "Zarejestruj się" : "Zaloguj się"}
+          </CardTitle>
           <CardDescription>
-            Wprowadź swój email i hasło aby wejść do budżetu
+            {isRegistering 
+              ? "Załóż nowe konto, aby zarządzać swoim budżetem" 
+              : "Wprowadź swój email i hasło aby wejść do budżetu"
+            }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="twoj@email.com" required className="bg-background/50" />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="twoj@email.com" 
+                required 
+                className="bg-background/50" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Hasło</Label>
-              <Input id="password" type="password" required className="bg-background/50" />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                className="bg-background/50" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-              Zaloguj
+            
+            {error && <p className="text-sm text-destructive font-medium text-center">{error}</p>}
+            
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" disabled={loading}>
+              {loading ? "Przetwarzanie..." : isRegistering ? "Zarejestruj" : "Zaloguj"}
             </Button>
           </form>
           
@@ -37,7 +122,7 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <Button variant="outline" type="button" className="w-full bg-background/50">
+          <Button variant="outline" type="button" className="w-full bg-background/50" onClick={handleGoogleSignIn}>
             <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -49,10 +134,17 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col items-center">
           <p className="mt-2 text-sm text-muted-foreground">
-            Nie masz konta?{" "}
-            <a href="#" className="underline text-primary hover:text-primary/80">
-              Zarejestruj się
-            </a>
+            {isRegistering ? "Masz już konto?" : "Nie masz konta?"}{" "}
+            <button 
+              type="button" 
+              className="underline text-primary hover:text-primary/80"
+              onClick={() => {
+                setIsRegistering(!isRegistering)
+                setError("")
+              }}
+            >
+              {isRegistering ? "Zaloguj się" : "Zarejestruj się"}
+            </button>
           </p>
         </CardFooter>
       </Card>
