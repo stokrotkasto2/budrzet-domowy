@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createTransaction } from "@/app/actions/transaction"
 import { Category } from "@prisma/client"
 import { useRouter } from "next/navigation"
+import Tesseract from "tesseract.js"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -15,6 +16,45 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   const [currency, setCurrency] = useState("PLN")
   const [exchangeRate, setExchangeRate] = useState<number | null>(null)
   const [amountInput, setAmountInput] = useState("")
+  const [dateInput, setDateInput] = useState(new Date().toISOString().slice(0, 16))
+  const [ocrLoading, setOcrLoading] = useState(false)
+
+  const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setOcrLoading(true);
+    try {
+      // Wywołanie sztucznej inteligencji OCR
+      const result = await Tesseract.recognize(file, 'pol');
+      const text = result.data.text.toUpperCase();
+      
+      // Proba wyciagniecia sumy (np. SUMA, PLN, RAZEM XXX.XX)
+      const amountRegex = /(?:SUMA|RAZEM|PLN).*?(\d+[.,]\d{2})/;
+      const matchAmount = text.match(amountRegex);
+      if (matchAmount) {
+        setAmountInput(matchAmount[1].replace(',', '.'));
+      } else {
+        // Fallback: znajdz najwieksza liczbe zmiennoprzecinkowa
+        const allNums = text.match(/\d+[.,]\d{2}/g);
+        if (allNums) {
+           const max = Math.max(...allNums.map(n => parseFloat(n.replace(',','.'))));
+           if (!isNaN(max)) setAmountInput(max.toString());
+        }
+      }
+
+      // Proba wyciagniecia daty np. YYYY-MM-DD
+      const dateRegex = /(\d{4}-\d{2}-\d{2})/;
+      const matchDate = text.match(dateRegex);
+      if (matchDate) {
+        setDateInput(matchDate[1] + "T12:00");
+      }
+    } catch (err) {
+      console.error("Błąd skanowania paragonu:", err);
+    } finally {
+      setOcrLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchRate() {
@@ -105,7 +145,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
 
           <div className="space-y-2">
             <Label htmlFor="date">Data i godzina</Label>
-            <Input id="date" name="date" type="datetime-local" required defaultValue={new Date().toISOString().slice(0, 16)} />
+            <Input id="date" name="date" type="datetime-local" required value={dateInput} onChange={e => setDateInput(e.target.value)} />
           </div>
 
           <div className="space-y-2">
@@ -126,9 +166,11 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
           </div>
 
           {type === "EXPENSE" && (
-            <div className="space-y-2">
-              <Label htmlFor="receipt">Zdjęcie paragonu</Label>
-              <Input id="receipt" name="receipt" type="file" accept="image/*" capture="environment" className="file:bg-primary file:text-primary-foreground file:border-0 file:rounded-md file:px-2 file:py-1 cursor-pointer" />
+            <div className="space-y-2 border border-primary/20 p-4 rounded-lg bg-primary/5">
+              <Label htmlFor="receipt" className="text-primary font-bold">📷 Zeskanuj paragon (OCR)</Label>
+              <Input id="receipt" name="receipt" type="file" accept="image/*" capture="environment" onChange={handleReceiptChange} className="file:bg-primary file:text-primary-foreground file:border-0 file:rounded-md file:px-2 file:py-1 cursor-pointer bg-background" />
+              {ocrLoading && <p className="text-sm text-primary animate-pulse font-medium">Skanowanie w toku... Analizuję rachunek 🔎</p>}
+              <p className="text-xs text-muted-foreground mt-2">Zrób zdjęcie, a inteligentny algorytm sam przepisze kwotę i datę!</p>
             </div>
           )}
 
