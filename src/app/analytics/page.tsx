@@ -4,10 +4,9 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import AnalysisChart from "@/components/AnalysisChart"
 
-// Wykorzystujemy globalny klient prisma
-
-export default async function AnalyticsPage() {
+export default async function AnalysisPage() {
   const session = await auth()
   if (!session?.user?.id) return redirect("/login")
 
@@ -20,19 +19,45 @@ export default async function AnalyticsPage() {
   let totalIncome = 0;
   let totalExpense = 0;
   
-  const categorySpending: Record<string, number> = {};
+  const categorySpending: Record<string, { value: number, color: string }> = {};
+  const categoryIncome: Record<string, { value: number, color: string }> = {};
 
   transactions.forEach(t => {
+    const amount = t.amount;
+    const catName = t.category?.name || "Inne";
+    const catColor = t.category?.color || "#3b82f6";
+
     if (t.type === 'INCOME') {
-      totalIncome += t.amount;
+      totalIncome += amount;
+      if (!categoryIncome[catName]) {
+        categoryIncome[catName] = { value: 0, color: catColor };
+      }
+      categoryIncome[catName].value += amount;
     } else {
-      totalExpense += t.amount;
-      const catName = t.category?.name || "Inne";
-      categorySpending[catName] = (categorySpending[catName] || 0) + t.amount;
+      totalExpense += amount;
+      if (!categorySpending[catName]) {
+        categorySpending[catName] = { value: 0, color: catColor };
+      }
+      categorySpending[catName].value += amount;
     }
   });
 
-  const maxCategorySpend = Math.max(...Object.values(categorySpending), 1);
+  const summaryData = [
+    { name: "Przychody", value: totalIncome, color: "#10b981" },
+    { name: "Wydatki", value: totalExpense, color: "#ef4444" }
+  ].filter(d => d.value > 0);
+
+  const expenseData = Object.entries(categorySpending).map(([name, data]) => ({
+    name,
+    value: data.value,
+    color: data.color
+  })).sort((a, b) => b.value - a.value);
+
+  const incomeData = Object.entries(categoryIncome).map(([name, data]) => ({
+    name,
+    value: data.value,
+    color: data.color
+  })).sort((a, b) => b.value - a.value);
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
@@ -41,7 +66,7 @@ export default async function AnalyticsPage() {
           <Link href="/">
             <Button variant="ghost">{"<"} Wróć do panelu</Button>
           </Link>
-          <span className="font-bold text-xl ml-4 tracking-tight text-primary">Analityka</span>
+          <span className="font-bold text-xl ml-4 tracking-tight text-primary">Analiza</span>
         </div>
       </header>
 
@@ -67,38 +92,47 @@ export default async function AnalyticsPage() {
           </Card>
         </div>
 
-        <Card className="bg-card/40 backdrop-blur-md border-border/50">
-          <CardHeader>
-            <CardTitle>Struktura wydatków wg Kategorii</CardTitle>
-            <CardDescription>Zobacz, na co wydajesz najwięcej środków.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {Object.keys(categorySpending).length === 0 ? (
-              <p className="text-muted-foreground text-center">Brak danych o wydatkach.</p>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(categorySpending).sort(([,a], [,b]) => b - a).map(([catName, amount]) => {
-                  const percentage = ((amount / maxCategorySpend) * 100).toFixed(0);
-                  const totalPercent = totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : 0;
-                  return (
-                    <div key={catName} className="space-y-1">
-                      <div className="flex justify-between text-sm font-medium">
-                        <span>{catName}</span>
-                        <span>{amount.toFixed(2)} PLN ({totalPercent}%)</span>
-                      </div>
-                      <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary transition-all duration-500" 
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="bg-card/40 backdrop-blur-md border-border/50">
+            <CardHeader>
+              <CardTitle>Podsumowanie Ogólne</CardTitle>
+              <CardDescription>Stosunek przychodów do wydatków.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {summaryData.length > 0 ? (
+                <AnalysisChart data={summaryData} title="Przychody vs Wydatki" />
+              ) : (
+                <p className="text-muted-foreground text-center py-20">Brak danych do wyświetlenia wykresu.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/40 backdrop-blur-md border-border/50">
+            <CardHeader>
+              <CardTitle>Struktura Wydatków</CardTitle>
+              <CardDescription>Podział wydatków na kategorie.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {expenseData.length > 0 ? (
+                <AnalysisChart data={expenseData} title="Wydatki wg Kategorii" />
+              ) : (
+                <p className="text-muted-foreground text-center py-20">Brak danych o wydatkach.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {incomeData.length > 0 && (
+          <Card className="bg-card/40 backdrop-blur-md border-border/50">
+            <CardHeader>
+              <CardTitle>Struktura Przychodów</CardTitle>
+              <CardDescription>Podział przychodów na kategorie.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AnalysisChart data={incomeData} title="Przychody wg Kategorii" />
+            </CardContent>
+          </Card>
+        )}
 
       </main>
     </div>

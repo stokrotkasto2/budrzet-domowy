@@ -19,6 +19,7 @@ export async function createCategory(formData: FormData) {
   const type = formData.get("type") as TransactionType
   const budgetLimit = formData.get("budgetLimit") ? parseFloat(formData.get("budgetLimit") as string) : null
   const budgetLimitType = formData.get("budgetLimitType") as LimitType
+  const color = formData.get("color") as string
 
   if (!name) throw new Error("Nazwa jest wymagana")
 
@@ -28,7 +29,8 @@ export async function createCategory(formData: FormData) {
       name,
       type,
       budgetLimit,
-      budgetLimitType: budgetLimitType || "AMOUNT"
+      budgetLimitType: budgetLimitType || "AMOUNT",
+      color: color || "#3b82f6"
     }
   })
 

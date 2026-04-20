@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { createCategory, deleteCategory } from "@/app/actions/category"
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export default async function CategoriesSettings() {
   const session = await auth()
@@ -55,6 +55,14 @@ export default async function CategoriesSettings() {
                 </select>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="color">Kolor na wykresie</Label>
+                <div className="flex gap-2">
+                  <Input id="color" name="color" type="color" defaultValue="#3b82f6" className="w-16 h-10 p-1" />
+                  <Input type="text" value="Wybierz kolor dla tej kategorii" disabled className="flex-1 text-xs text-muted-foreground" />
+                </div>
+              </div>
+
               <Button type="submit" className="w-full">Stwórz kategorię</Button>
             </form>
           </CardContent>
@@ -71,7 +79,8 @@ export default async function CategoriesSettings() {
               <ul className="space-y-4">
                 {categories.map((cat) => (
                   <li key={cat.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-background/50 p-3 rounded-lg border border-border/50">
-                    <div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded-full border border-border/50" style={{ backgroundColor: cat.color || "#3b82f6" }} />
                       <span className="font-semibold">{cat.name} </span>
                       <span className="text-xs uppercase px-2 py-1 bg-muted rounded-full ml-2">
                         {cat.type === "INCOME" ? "Przychód" : "Wydatek"}

@@ -138,7 +138,7 @@ export default async function Dashboard() {
               <div className="w-full h-[1px] bg-border my-2" />
               
               <Link href="/analytics">
-                <Button size="sm" variant="secondary" className="gap-2">📊 Analityka</Button>
+                <Button size="sm" variant="secondary" className="gap-2">📊 Analiza</Button>
               </Link>
               <Link href="/saving-goals">
                 <Button size="sm" variant="secondary" className="gap-2">🎯 Skarbonki</Button>
