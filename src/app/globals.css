@@ -127,8 +127,9 @@
   }
   .dark body {
     background-color: var(--background);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='3' fill='%23fbbf24'/%3E%3Cpath d='M30 22.5A2.5 2.5 0 0 1 30 15a2.5 2.5 0 0 1 0 7.5zm0 15a2.5 2.5 0 0 1 0 7.5 2.5 2.5 0 0 1 0-7.5zm-7.5-7.5a2.5 2.5 0 0 1-7.5 0 2.5 2.5 0 0 1 7.5 0zm15 0a2.5 2.5 0 0 1 7.5 0 2.5 2.5 0 0 1-7.5 0zm-10.6-5.3a2.5 2.5 0 0 1-5.3-5.3 2.5 2.5 0 0 1 5.3 5.3zm10.6 10.6a2.5 2.5 0 0 1 5.3 5.3 2.5 2.5 0 0 1-5.3-5.3zm0-10.6a2.5 2.5 0 0 1 5.3-5.3 2.5 2.5 0 0 1-5.3 5.3zm-10.6 10.6a2.5 2.5 0 0 1-5.3 5.3 2.5 2.5 0 0 1 5.3-5.3z' fill='%23ffffff'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 80px 80px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 160 160'%3E%3Cg opacity='0.15'%3E%3Cg fill='%23ffffff' stroke='%23999999' stroke-width='2.5'%3E%3Cellipse cx='80' cy='80' rx='8' ry='26' transform='rotate(0 80 80)'/%3E%3Cellipse cx='80' cy='80' rx='8' ry='26' transform='rotate(45 80 80)'/%3E%3Cellipse cx='80' cy='80' rx='8' ry='26' transform='rotate(90 80 80)'/%3E%3Cellipse cx='80' cy='80' rx='8' ry='26' transform='rotate(135 80 80)'/%3E%3C/g%3E%3Ccircle cx='80' cy='80' r='6.5' fill='%23fbbf24' stroke='%23999999' stroke-width='2.5'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    background-attachment: fixed;
   }
   html {
     @apply font-sans;
