@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [passwordRepeat, setPasswordRepeat] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,6 +28,24 @@ export default function LoginPage() {
       if (isRegistering) {
         if (password !== passwordRepeat) {
           setError("Podane hasła nie są identyczne!")
+          setLoading(false)
+          return
+        }
+
+        if (password.length <= 6) {
+          setError("Hasło musi mieć więcej niż 6 znaków!")
+          setLoading(false)
+          return
+        }
+        
+        if (!/[A-Z]/.test(password)) {
+          setError("Hasło musi zawierać co najmniej 1 dużą literę!")
+          setLoading(false)
+          return
+        }
+        
+        if (!/[^A-Za-z0-9]/.test(password)) {
+          setError("Hasło musi zawierać co najmniej 1 znak specjalny!")
           setLoading(false)
           return
         }
@@ -103,28 +123,67 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Hasło</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                required 
-                className="bg-background/50" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  className="bg-background/50 pr-10" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             
             {isRegistering && (
-              <div className="space-y-2">
-                <Label htmlFor="passwordRepeat">Powtórz hasło</Label>
-                <Input 
-                  id="passwordRepeat" 
-                  type="password" 
-                  required 
-                  className="bg-background/50" 
-                  value={passwordRepeat}
-                  onChange={(e) => setPasswordRepeat(e.target.value)}
-                />
-              </div>
+              <>
+                <div className="space-y-1 mt-2 mb-4 bg-muted/30 p-3 rounded-md border border-border/50">
+                  <p className="text-sm font-medium mb-2 text-foreground/80">Wymagania hasła:</p>
+                  <ul className="text-xs space-y-1.5 list-none">
+                    <li className={`flex items-center gap-2 ${password.length > 6 ? "text-green-500" : "text-muted-foreground"}`}>
+                      <span className="w-4 flex justify-center">{password.length > 6 ? "✓" : "○"}</span> Więcej niż 6 znaków
+                    </li>
+                    <li className={`flex items-center gap-2 ${/[A-Z]/.test(password) ? "text-green-500" : "text-muted-foreground"}`}>
+                      <span className="w-4 flex justify-center">{/[A-Z]/.test(password) ? "✓" : "○"}</span> Co najmniej 1 duża litera
+                    </li>
+                    <li className={`flex items-center gap-2 ${/[^A-Za-z0-9]/.test(password) ? "text-green-500" : "text-muted-foreground"}`}>
+                      <span className="w-4 flex justify-center">{/[^A-Za-z0-9]/.test(password) ? "✓" : "○"}</span> Co najmniej 1 znak specjalny
+                    </li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="passwordRepeat">Powtórz hasło</Label>
+                  <div className="relative">
+                    <Input 
+                      id="passwordRepeat" 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      className={`bg-background/50 pr-10 ${passwordRepeat && password !== passwordRepeat ? "border-destructive focus-visible:ring-destructive" : ""}`} 
+                      value={passwordRepeat}
+                      onChange={(e) => setPasswordRepeat(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordRepeat && password !== passwordRepeat && (
+                    <p className="text-xs text-destructive mt-1 font-medium">Hasło jest niepoprawnie powtórzone!</p>
+                  )}
+                </div>
+              </>
             )}
             
             {error && <p className="text-sm text-destructive font-medium text-center">{error}</p>}

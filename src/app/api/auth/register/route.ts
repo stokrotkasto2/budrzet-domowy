@@ -16,6 +16,27 @@ export async function POST(req: Request) {
       );
     }
 
+    if (password.length <= 6) {
+      return NextResponse.json(
+        { error: "Hasło musi mieć więcej niż 6 znaków" },
+        { status: 400 }
+      );
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json(
+        { error: "Hasło musi zawierać co najmniej 1 dużą literę" },
+        { status: 400 }
+      );
+    }
+    
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return NextResponse.json(
+        { error: "Hasło musi zawierać co najmniej 1 znak specjalny" },
+        { status: 400 }
+      );
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
