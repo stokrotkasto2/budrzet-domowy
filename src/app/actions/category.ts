@@ -1,11 +1,12 @@
 "use server"
 
-import { PrismaClient, TransactionType, LimitType } from "@prisma/client"
+import { TransactionType, LimitType } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export async function createCategory(formData: FormData) {
   const session = await auth()

@@ -1,10 +1,10 @@
 "use server"
 
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export async function createSubscription(formData: FormData) {
   const session = await auth()

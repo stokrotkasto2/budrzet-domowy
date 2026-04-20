@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { createSubscription, deleteSubscription } from "@/app/actions/subscriptions"
 import Link from "next/link"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export default async function SubscriptionsPage() {
   const session = await auth()

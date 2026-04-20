@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export default async function Dashboard() {
   const session = await auth()

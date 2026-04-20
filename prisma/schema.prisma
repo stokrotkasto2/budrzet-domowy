@@ -8,38 +8,35 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?   @unique
-  password      String?
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
+  password      String?
   accounts      Account[]
-  sessions      Session[]
-  
-  // Relacje biznesowe
-  wallets       Wallet[]
-  transactions  Transaction[]
   categories    Category[]
   savingGoals   SavingGoal[]
+  sessions      Session[]
   subscriptions Subscription[]
+  transactions  Transaction[]
+  wallets       Wallet[]
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -60,91 +57,73 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// -----------------------------------------------------
-// Modele biznesowe aplikacji Budżet Domowy
-// -----------------------------------------------------
-
 model Wallet {
-  id          String        @id @default(cuid())
-  name        String        // np. Karta, Gotówka
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  name         String
+  userId       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   transactions Transaction[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Category {
-  id          String        @id @default(cuid())
-  name        String
-  type        TransactionType // INCOME lub EXPENSE
-  icon        String?
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String          @id @default(cuid())
+  name         String
+  type         TransactionType
+  icon         String?
+  userId       String
+  parentId     String?
+  budgetLimit  Float?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  parent       Category?       @relation("SubCategories", fields: [parentId], references: [id])
+  children     Category[]      @relation("SubCategories")
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
-  parentId    String?       // Dla podkategorii
-  parent      Category?     @relation("SubCategories", fields: [parentId], references: [id])
-  children    Category[]    @relation("SubCategories")
-  
-  // Limit miesięczny
-  budgetLimit Float?
-  budgetLimitType LimitType? @default(AMOUNT)
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-}
-
-enum LimitType {
-  AMOUNT
-  PERCENTAGE
 }
 
 model Transaction {
-  id          String        @id @default(cuid())
-  amount      Float
-  type        TransactionType // INCOME lub EXPENSE
-  date        DateTime
-  note        String?
-  
-  // Relacje
-  categoryId  String
-  category    Category      @relation(fields: [categoryId], references: [id])
-  walletId    String
-  wallet      Wallet        @relation(fields: [walletId], references: [id])
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Opcjonalne dodatki 
-  location    String?
-  receiptUrl  String?
-  currency    String        @default("PLN")
-  debtorName  String?       // Kto mi wisi/komu wiszę
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id         String          @id @default(cuid())
+  amount     Float
+  type       TransactionType
+  date       DateTime
+  note       String?
+  categoryId String
+  walletId   String
+  userId     String
+  location   String?
+  receiptUrl String?
+  currency   String          @default("PLN")
+  debtorName String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  category   Category        @relation(fields: [categoryId], references: [id])
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet     Wallet          @relation(fields: [walletId], references: [id])
 }
 
 model SavingGoal {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String
   targetAmount  Float
-  currentAmount Float     @default(0)
+  currentAmount Float    @default(0)
   imageUrl      String?
   userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
-  id          String    @id @default(cuid())
-  name        String
-  amount      Float
-  dayOfMonth  Int
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  name       String
+  amount     Float
+  dayOfMonth Int
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum TransactionType {
