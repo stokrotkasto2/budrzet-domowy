@@ -19,7 +19,7 @@ export default async function SavingGoalsPage() {
   })
 
   return (
-    <div className="flex min-h-screen flex-col bg-background/95">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center px-4">
           <Link href="/">
@@ -30,7 +30,7 @@ export default async function SavingGoalsPage() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
-        <Card className="bg-card/90 backdrop-blur-sm border-primary/20">
+        <Card className="bg-card/40 backdrop-blur-md border-primary/20">
           <CardHeader>
             <CardTitle>Stwórz nową Skarbonkę</CardTitle>
             <CardDescription>Odkładaj środki na wymarzone rzeczy: samochód, wczasy...</CardDescription>
@@ -54,7 +54,7 @@ export default async function SavingGoalsPage() {
           {goals.map(goal => {
             const percentage = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100).toFixed(1)
             return (
-              <Card key={goal.id} className="bg-card/90 border-border/50 shadow-lg relative overflow-hidden">
+              <Card key={goal.id} className="bg-card/40 border-border/50 shadow-lg relative overflow-hidden backdrop-blur-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl flex justify-between items-center">
                     {goal.name}

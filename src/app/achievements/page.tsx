@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 // Definicje odznak
 const ALL_BADGES = [
@@ -52,7 +52,7 @@ export default async function AchievementsPage() {
   if (txs.some(t => t.debtorName !== null && t.debtorName.length > 2)) earnedBadges.add('collector')
 
   return (
-    <div className="flex min-h-screen flex-col bg-background/95">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center px-4">
           <Link href="/">
@@ -79,7 +79,7 @@ export default async function AchievementsPage() {
           {ALL_BADGES.map(badge => {
             const isEarned = earnedBadges.has(badge.id)
             return (
-              <Card key={badge.id} className={`transition-all duration-500 overflow-hidden ${isEarned ? 'bg-card/90 shadow-xl border-primary/40 scale-100' : 'bg-muted/30 border-dashed opacity-60 scale-[0.98] blur-[0.5px] hover:blur-none'}`}>
+              <Card key={badge.id} className={`transition-all duration-500 overflow-hidden ${isEarned ? 'bg-card/40 backdrop-blur-md shadow-xl border-primary/40 scale-100' : 'bg-muted/30 border-dashed opacity-60 scale-[0.98] blur-[0.5px] hover:blur-none'}`}>
                 <CardHeader className="text-center pb-2">
                   <div className={`mx-auto text-5xl mb-4 ${isEarned ? 'drop-shadow-lg scale-110' : 'grayscale'}`}>
                     {badge.icon}

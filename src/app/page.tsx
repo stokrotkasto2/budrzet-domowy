@@ -69,7 +69,7 @@ export default async function Dashboard() {
 
 
   return (
-    <div className="flex min-h-screen flex-col bg-background/95">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
@@ -123,7 +123,7 @@ export default async function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="col-span-full lg:col-span-2 shadow-lg border-border/50 bg-card/60 backdrop-blur-sm">
+          <Card className="col-span-full lg:col-span-2 shadow-lg border-border/50 bg-card/40 backdrop-blur-md">
             <CardHeader>
               <CardTitle>Narzędznia i Akcje</CardTitle>
             </CardHeader>
@@ -157,7 +157,7 @@ export default async function Dashboard() {
         </section>
 
         <section>
-          <Card className="shadow-lg border-border/50 bg-card/60 backdrop-blur-sm">
+          <Card className="shadow-lg border-border/50 bg-card/40 backdrop-blur-md">
             <CardHeader>
               <CardTitle>Ostatnie operacje</CardTitle>
               <CardDescription>Twoja najnowsza aktywność finansowa.</CardDescription>

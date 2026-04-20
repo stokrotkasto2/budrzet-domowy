@@ -23,7 +23,7 @@ export default async function SubscriptionsPage() {
   const dzisiaj = new Date().getDate()
 
   return (
-    <div className="flex min-h-screen flex-col bg-background/95">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center px-4">
           <Link href="/">
@@ -36,7 +36,7 @@ export default async function SubscriptionsPage() {
       <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
         <div className="grid lg:grid-cols-3 gap-6 items-start">
           
-          <Card className="bg-card/90 border-border/50 shadow-md lg:col-span-1 sticky top-24">
+          <Card className="bg-card/40 border-border/50 shadow-md lg:col-span-1 sticky top-24 backdrop-blur-md">
             <CardHeader>
               <CardTitle>Nowa Płatność</CardTitle>
               <CardDescription>Dodaj Netflix, Spotify czy prąd</CardDescription>
@@ -60,7 +60,7 @@ export default async function SubscriptionsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-xl overflow-hidden lg:col-span-2">
+          <Card className="bg-card/40 backdrop-blur-md border-primary/20 shadow-xl overflow-hidden lg:col-span-2">
             <CardHeader>
               <CardTitle>Harmonogram</CardTitle>
             </CardHeader>

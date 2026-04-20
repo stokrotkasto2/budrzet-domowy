@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const prisma = new PrismaClient()
+// Wykorzystujemy globalny klient prisma
 
 export default async function AnalyticsPage() {
   const session = await auth()
@@ -35,7 +35,7 @@ export default async function AnalyticsPage() {
   const maxCategorySpend = Math.max(...Object.values(categorySpending), 1);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background/95">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center px-4">
           <Link href="/">
@@ -48,7 +48,7 @@ export default async function AnalyticsPage() {
       <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-card/90 backdrop-blur-sm border-emerald-500/20">
+          <Card className="bg-card/40 backdrop-blur-md border-emerald-500/20">
             <CardHeader>
               <CardTitle className="text-emerald-500">Całkowity Przychód</CardTitle>
             </CardHeader>
@@ -57,7 +57,7 @@ export default async function AnalyticsPage() {
             </CardContent>
           </Card>
           
-          <Card className="bg-card/90 backdrop-blur-sm border-destructive/20">
+          <Card className="bg-card/40 backdrop-blur-md border-destructive/20">
             <CardHeader>
               <CardTitle className="text-destructive">Całkowite Wydatki</CardTitle>
             </CardHeader>
@@ -67,7 +67,7 @@ export default async function AnalyticsPage() {
           </Card>
         </div>
 
-        <Card className="bg-card/90 backdrop-blur-sm border-border/50">
+        <Card className="bg-card/40 backdrop-blur-md border-border/50">
           <CardHeader>
             <CardTitle>Struktura wydatków wg Kategorii</CardTitle>
             <CardDescription>Zobacz, na co wydajesz najwięcej środków.</CardDescription>

@@ -95,7 +95,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-card/90 backdrop-blur-sm border-border/50 shadow-xl mt-8">
+    <Card className="w-full max-w-lg mx-auto bg-card/40 backdrop-blur-md border-border/50 shadow-xl mt-8">
       <CardHeader>
         <CardTitle>{type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}</CardTitle>
         <CardDescription>Wypełnij dane, aby dodać transakcję do budżetu.</CardDescription>

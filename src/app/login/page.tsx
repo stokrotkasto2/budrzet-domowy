@@ -95,9 +95,12 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border-border/50 shadow-2xl">
+      <Card className="w-full max-w-md bg-card/40 backdrop-blur-md border-border/50 shadow-2xl relative overflow-hidden">
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold tracking-tight">
+            <span className="block text-4xl mb-2">🌼</span>
             {isRegistering ? "Zarejestruj się" : "Zaloguj się"}
           </CardTitle>
           <CardDescription>
