@@ -134,6 +134,6 @@
     background-attachment: fixed;
   }
   html {
-    @apply font-sans;
+    font-family: Arial, sans-serif;
   }
 }
