@@ -269,7 +269,5 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
         </form>
       </CardContent>
     </Card>
-      </CardContent>
-    </Card>
   )
 }
