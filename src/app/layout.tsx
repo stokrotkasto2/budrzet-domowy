@@ -17,12 +17,15 @@ export const metadata: Metadata = {
   title: "Budżet Domowy",
   description: "Aplikacja do zarządzania domowym budżetem",
   manifest: "/manifest.json",
-  themeColor: "#0a0a0a",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Budżet Domowy",
   },
+};
+
+export const viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({

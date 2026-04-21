@@ -38,7 +38,7 @@ export default function AnalysisChart({ data, title }: { data: ChartData[], titl
                 borderRadius: '12px' 
               }}
               itemStyle={{ color: '#fff' }}
-              formatter={(value: number) => [`${value.toFixed(2)} PLN`, 'Kwota']}
+              formatter={(value: any) => [`${parseFloat(value).toFixed(2)} PLN`, 'Kwota']}
             />
             <Legend 
               verticalAlign="bottom" 

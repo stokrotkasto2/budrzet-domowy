@@ -74,14 +74,20 @@ model Category {
   icon         String?
   userId       String
   parentId     String?
-  budgetLimit  Float?
-  color        String?         @default("#3b82f6")
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  parent       Category?       @relation("SubCategories", fields: [parentId], references: [id])
-  children     Category[]      @relation("SubCategories")
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
+  budgetLimit     Float?
+  budgetLimitType LimitType       @default(AMOUNT)
+  color           String?         @default("#3b82f6")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  parent          Category?       @relation("SubCategories", fields: [parentId], references: [id])
+  children        Category[]      @relation("SubCategories")
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+}
+
+enum LimitType {
+  AMOUNT
+  PERCENTAGE
 }
 
 model Transaction {
