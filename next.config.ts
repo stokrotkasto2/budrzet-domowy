@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* Odkomentuj poniższą linię, aby włączyć eksport statyczny dla Surge.sh */
+  /* output: 'export', */
 };
 
 export default nextConfig;
