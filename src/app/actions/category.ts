@@ -23,7 +23,7 @@ export async function createCategory(formData: FormData) {
 
   if (!name) throw new Error("Nazwa jest wymagana")
 
-  await prisma.category.create({
+  const newCategory = await prisma.category.create({
     data: {
       userId: session.user.id,
       name,
@@ -35,6 +35,7 @@ export async function createCategory(formData: FormData) {
   })
 
   revalidatePath("/settings/categories")
+  return newCategory
 }
 
 export async function deleteCategory(categoryId: string) {

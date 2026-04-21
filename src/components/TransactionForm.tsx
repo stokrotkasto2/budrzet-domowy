@@ -18,6 +18,8 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   const [amountInput, setAmountInput] = useState("")
   const [dateInput, setDateInput] = useState(new Date().toISOString().slice(0, 16))
   const [ocrLoading, setOcrLoading] = useState(false)
+  const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
+  const [newCatName, setNewCatName] = useState("")
 
   const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,6 +99,35 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     return (parseFloat(amountInput) * exchangeRate).toFixed(2)
   }
 
+  // Stan dla dynamicznej listy kategorii
+  const [localCategories, setLocalCategories] = useState(categories)
+  const [selectedCategoryId, setSelectedCategoryId] = useState("")
+
+  const handleAddNewCategory = async () => {
+    if (!newCatName) return
+    setLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append("name", newCatName)
+      formData.append("type", type)
+      formData.append("color", "#3b82f6") // Domyslny niebieski
+      
+      const res = await createCategory(formData)
+      if (res && res.id) {
+        // Dodaj do lokalnej listy i zaznacz
+        setLocalCategories([...localCategories, res])
+        setSelectedCategoryId(res.id)
+        setShowNewCategoryForm(false)
+        setNewCatName("")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Błąd podczas dodawania kategorii")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -104,6 +135,9 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     try {
       const formData = new FormData(e.currentTarget)
       formData.append("type", type)
+      // Upewnij sie ze bierzemy wybrana kategorie (rowniez te nowo dodana)
+      formData.set("categoryId", selectedCategoryId)
+      
       await createTransaction(formData)
       router.push("/")
       router.refresh()
@@ -119,7 +153,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl">
       <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-bold tracking-tight">
-          {type === "INCOME" ? "💰 Dodaj Przychód" : "🛍️ Nowy Wydatek"}
+          {type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}
         </CardTitle>
         <CardDescription>Uzupełnij dane lub pozwól AI zeskanować Twój paragon.</CardDescription>
       </CardHeader>
@@ -211,13 +245,44 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
               id="categoryId" 
               className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-3 py-2 text-sm font-medium" 
               required
+              value={selectedCategoryId}
+              onChange={(e) => {
+                if (e.target.value === "NEW") {
+                  setShowNewCategoryForm(true)
+                } else {
+                  setSelectedCategoryId(e.target.value)
+                  setShowNewCategoryForm(false)
+                }
+              }}
             >
               <option value="">Wybierz kategorię...</option>
-              {categories.map(c => (
+              {localCategories.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
+              <option value="NEW" className="text-primary font-bold">+ Dodaj nową kategorię...</option>
             </select>
           </div>
+
+          {showNewCategoryForm && (
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2">
+              <Label htmlFor="newCatName" className="text-xs font-bold text-primary uppercase">Nazwa nowej kategorii</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="newCatName" 
+                  value={newCatName} 
+                  onChange={(e) => setNewCatName(e.target.value)} 
+                  placeholder="np. Kawiarnie" 
+                  className="bg-background/50 rounded-xl"
+                />
+                <Button type="button" onClick={handleAddNewCategory} disabled={!newCatName || loading} className="rounded-xl">
+                  Dodaj
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setShowNewCategoryForm(false)} className="rounded-xl">
+                  Anuluj
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="date" className="font-semibold px-1">Data i godzina</Label>
@@ -245,7 +310,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
             <Button 
               type="submit" 
               className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]" 
-              disabled={loading}
+              disabled={loading || selectedCategoryId === "NEW" || !selectedCategoryId}
             >
               {loading ? (
                 <div className="flex items-center gap-2">

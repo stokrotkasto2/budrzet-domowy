@@ -122,18 +122,89 @@ export default async function AnalysisPage() {
           </Card>
         </div>
 
-        {incomeData.length > 0 && (
-          <Card className="bg-card/40 backdrop-blur-md border-border/50">
-            <CardHeader>
-              <CardTitle>Struktura Przychodów</CardTitle>
-              <CardDescription>Podział przychodów na kategorie.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AnalysisChart data={incomeData} title="Przychody wg Kategorii" />
-            </CardContent>
-          </Card>
-        )}
+        <div className="space-y-8 pt-8 border-t border-border/50">
+          <h2 className="text-2xl font-bold tracking-tight">Szczegółowy wykaz transakcji</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Wykaz Wydatków */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-destructive flex items-center gap-2">
+                📂 Wydatki wg kategorii
+              </h3>
+              {expenseData.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Brak wydatków do wyświetlenia.</p>
+              ) : (
+                expenseData.map(cat => {
+                  const catTransactions = transactions.filter(t => t.type === 'EXPENSE' && (t.category?.name || "Inne") === cat.name);
+                  return (
+                    <Card key={cat.name} className="bg-card/30 border-l-4" style={{ borderLeftColor: cat.color }}>
+                      <CardHeader className="py-3 px-4">
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-base font-bold">{cat.name}</CardTitle>
+                          <span className="font-bold text-destructive">-{cat.value.toFixed(2)} PLN</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="px-4 pb-3 pt-0">
+                        <div className="space-y-2 mt-2">
+                          {catTransactions.map(t => (
+                            <div key={t.id} className="flex justify-between text-sm py-1 border-b border-border/30 last:border-0">
+                              <div className="flex flex-col">
+                                <span className="font-medium">{t.note || "Bez nazwy"}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {t.date.toLocaleDateString("pl-PL")} {t.location ? `• ${t.location}` : ""}
+                                </span>
+                              </div>
+                              <span className="font-medium">-{t.amount.toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })
+              )}
+            </div>
 
+            {/* Wykaz Przychodów */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-emerald-500 flex items-center gap-2">
+                💰 Przychody wg kategorii
+              </h3>
+              {incomeData.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Brak przychodów do wyświetlenia.</p>
+              ) : (
+                incomeData.map(cat => {
+                  const catTransactions = transactions.filter(t => t.type === 'INCOME' && (t.category?.name || "Inne") === cat.name);
+                  return (
+                    <Card key={cat.name} className="bg-card/30 border-l-4" style={{ borderLeftColor: cat.color }}>
+                      <CardHeader className="py-3 px-4">
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-base font-bold">{cat.name}</CardTitle>
+                          <span className="font-bold text-emerald-500">+{cat.value.toFixed(2)} PLN</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="px-4 pb-3 pt-0">
+                        <div className="space-y-2 mt-2">
+                          {catTransactions.map(t => (
+                            <div key={t.id} className="flex justify-between text-sm py-1 border-b border-border/30 last:border-0">
+                              <div className="flex flex-col">
+                                <span className="font-medium">{t.note || "Bez nazwy"}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {t.date.toLocaleDateString("pl-PL")}
+                                </span>
+                              </div>
+                              <span className="font-medium">+{t.amount.toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })
+              )}
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   )
