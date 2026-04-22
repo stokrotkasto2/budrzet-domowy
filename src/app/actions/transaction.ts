@@ -24,12 +24,17 @@ export async function createTransaction(formData: FormData) {
   const location = formData.get("location") as string
   
   // Zakładamy, że portfel pobieramy w tle (pierwszy portfel usera dopóki brak multiselecta)
-  const wallet = await prisma.wallet.findFirst({
+  let wallet = await prisma.wallet.findFirst({
     where: { userId: session.user.id }
   })
 
   if (!wallet) {
-    throw new Error("Użytkownik nie posiada portfela")
+    wallet = await prisma.wallet.create({
+      data: {
+        userId: session.user.id,
+        name: "Portfel Główny"
+      }
+    })
   }
 
   // Handle receipt (in real app we would upload it to storage e.g. AWS S3, Supabase Storage, here just simple URL string if provided)
@@ -59,8 +64,27 @@ export async function createTransaction(formData: FormData) {
   })
 
   revalidatePath("/")
+  revalidatePath("/analytics")
+  revalidatePath("/transactions")
   redirect("/")
 }
+
+export async function deleteTransaction(id: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("Brak autoryzacji")
+
+  await prisma.transaction.delete({
+    where: { 
+      id,
+      userId: session.user.id // Security: ensure user owns the transaction
+    }
+  })
+
+  revalidatePath("/")
+  revalidatePath("/analytics")
+  revalidatePath("/transactions")
+}
+
 
 export async function fetchCategories(type: "INCOME" | "EXPENSE") {
   const session = await auth()

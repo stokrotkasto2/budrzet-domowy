@@ -189,6 +189,11 @@ export default async function Dashboard() {
                   )
                 })}
               </div>
+              <div className="mt-6 text-center">
+                <Link href="/transactions">
+                  <Button variant="ghost" className="text-muted-foreground hover:text-primary">Zobacz pełną historię</Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </section>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createTransaction } from "@/app/actions/transaction"
+import { createCategory } from "@/app/actions/category"
 import { Category } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import Tesseract from "tesseract.js"
