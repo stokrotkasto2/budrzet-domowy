@@ -38,6 +38,7 @@ export async function createCategory(formData: FormData) {
   return newCategory
 }
 
+
 export async function deleteCategory(categoryId: string) {
   const session = await auth()
   

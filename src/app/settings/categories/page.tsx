@@ -28,7 +28,7 @@ export default async function CategoriesSettings() {
             <CardDescription>Ustal własne limity wydatków lub śledź przychody.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={createCategory} className="space-y-4">
+            <form action={async (formData) => { "use server"; await createCategory(formData); }} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nazwa Kategorii</Label>
                 <Input id="name" name="name" required placeholder="np. Zakupy, Rozrywka..." />

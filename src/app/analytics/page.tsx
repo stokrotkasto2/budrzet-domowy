@@ -62,11 +62,16 @@ export default async function AnalysisPage() {
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
       <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur">
-        <div className="container mx-auto flex h-16 items-center px-4">
-          <Link href="/">
-            <Button variant="ghost">{"<"} Wróć do panelu</Button>
+        <div className="container mx-auto flex h-16 items-center px-4 justify-between">
+          <div className="flex items-center">
+            <Link href="/">
+              <Button variant="ghost">{"<"} Wróć do panelu</Button>
+            </Link>
+            <span className="font-bold text-xl ml-4 tracking-tight text-primary">Analiza</span>
+          </div>
+          <Link href="/transactions/new/expense">
+            <Button size="sm">+ Dodaj wydatek</Button>
           </Link>
-          <span className="font-bold text-xl ml-4 tracking-tight text-primary">Analiza</span>
         </div>
       </header>
 

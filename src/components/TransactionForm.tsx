@@ -32,23 +32,52 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     try {
       const result = await Tesseract.recognize(file, 'pol');
       const text = result.data.text.toUpperCase();
+      console.log("OCR Result:", text);
       
-      const amountRegex = /(?:SUMA|RAZEM|PLN).*?(\d+[.,]\d{2})/;
-      const matchAmount = text.match(amountRegex);
-      if (matchAmount) {
-        setAmountInput(matchAmount[1].replace(',', '.'));
-      } else {
-        const allNums = text.match(/\d+[.,]\d{2}/g);
-        if (allNums) {
-           const max = Math.max(...allNums.map(n => parseFloat(n.replace(',','.'))));
-           if (!isNaN(max)) setAmountInput(max.toString());
+      // Kwota: szukamy SUMA, DO ZAPŁATY, RAZEM itp.
+      const amountPatterns = [
+        /(?:SUMA|RAZEM|ZAPŁATY|TOTAL|PLN).*?(\d+[.,]\d{2})/i,
+        /(\d+[.,]\d{2})\s*(?:PLN|ZŁ)/i,
+        /(\d+[.,]\d{2})/g // fallback - weźmiemy największą
+      ];
+
+      let foundAmount = "";
+      for (const pattern of amountPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          if (pattern.global) {
+             const allNums = text.match(pattern);
+             if (allNums) {
+               const max = Math.max(...allNums.map(n => parseFloat(n.replace(',','.'))));
+               if (!isNaN(max)) foundAmount = max.toString();
+             }
+          } else {
+            foundAmount = match[1].replace(',', '.');
+            break;
+          }
         }
       }
+      if (foundAmount) setAmountInput(foundAmount);
 
-      const dateRegex = /(\d{4}-\d{2}-\d{2})/;
-      const matchDate = text.match(dateRegex);
-      if (matchDate) {
-        setDateInput(matchDate[1] + "T12:00");
+      // Data: YYYY-MM-DD, DD-MM-YYYY, DD.MM.YYYY
+      const datePatterns = [
+        /(\d{4}-\d{2}-\d{2})/,
+        /(\d{2}-\d{2}-\d{4})/,
+        /(\d{2}\.\d{2}\.\d{4})/
+      ];
+
+      for (const pattern of datePatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          let dateStr = match[1].replace(/\./g, '-');
+          // Jeśli DD-MM-YYYY, zamień na YYYY-MM-DD
+          const parts = dateStr.split('-');
+          if (parts[0].length === 2) {
+            dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          }
+          setDateInput(`${dateStr}T12:00`);
+          break;
+        }
       }
     } catch (err) {
       console.error("Błąd skanowania paragonu:", err);
@@ -124,7 +153,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl mb-24">
+    <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl mb-32">
       <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-bold tracking-tight">
           {type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}
@@ -247,17 +276,17 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
             </div>
           )}
 
-          <div className="flex gap-4 pt-4 sm:relative">
+          <div className="flex gap-4 pt-4">
             <Button 
               type="button" 
               variant="outline" 
-              className="w-full rounded-2xl h-12" 
+              className="flex-1 rounded-2xl h-12" 
               onClick={() => router.back()}
             >
               Anuluj
             </Button>
             
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border/50 sm:relative sm:p-0 sm:bg-transparent sm:border-0 z-[100]">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border/50 sm:relative sm:p-0 sm:bg-transparent sm:border-0 sm:flex-1 z-[100]">
               <Button 
                 type="submit" 
                 className="w-full h-12 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20" 
