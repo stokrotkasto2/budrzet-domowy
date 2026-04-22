@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import TopBar from "@/components/TopBar" // I noticed TopBar exists in my list_dir earlier
+import TopBar from "@/components/TopBar"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { deleteTransaction } from "@/app/actions/transaction"
@@ -77,10 +77,16 @@ export default async function TransactionsPage() {
                                         <td className={`px-6 py-4 text-right font-bold ${t.type === 'INCOME' ? "text-emerald-500" : ""}`}>
                                             {t.type === 'INCOME' ? "+" : "-"}{t.amount.toFixed(2)} {t.currency}
                                         </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <form action={deleteTransaction.bind(null, t.id)}>
-                                                <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10">Usuń</Button>
-                                            </form>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Link href={`/transactions/${t.id}`}>
+                                                    <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10 font-bold">Szczegóły</Button>
+                                                </Link>
+                                                <form action={deleteTransaction}>
+                                                    <input type="hidden" name="id" value={t.id} />
+                                                    <Button type="submit" size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10">Usuń</Button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

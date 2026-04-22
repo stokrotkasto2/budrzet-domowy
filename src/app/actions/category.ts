@@ -55,6 +55,7 @@ export async function deleteCategory(categoryId: string) {
     throw new Error("Nie masz uprawnień albo kategoria nie istnieje")
   }
 
+  // Dzięki onDelete: Cascade w schemacie Prisma, transakcje i podkategorie zostaną usunięte automatycznie
   await prisma.category.delete({
     where: { id: categoryId }
   })

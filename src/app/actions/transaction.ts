@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { isRedirectError } from "next/dist/client/components/redirect"
 
 // Wykorzystujemy globalny klient prisma
 
@@ -69,20 +70,72 @@ export async function createTransaction(formData: FormData) {
   redirect("/")
 }
 
-export async function deleteTransaction(id: string) {
+export async function updateTransaction(id: string, formData: FormData) {
   const session = await auth()
-  if (!session?.user?.id) throw new Error("Brak autoryzacji")
+  if (!session?.user?.id) throw new Error("Musisz być zalogowany")
 
-  await prisma.transaction.delete({
+  const type = formData.get("type") as "INCOME" | "EXPENSE"
+  const amount = parseFloat(formData.get("amount") as string)
+  const categoryId = formData.get("categoryId") as string
+  const dateStr = formData.get("date") as string
+  const note = formData.get("note") as string
+  const currency = formData.get("currency") as string || "PLN"
+  const debtorName = formData.get("debtorName") as string
+  const location = formData.get("location") as string
+
+  const date = new Date(dateStr)
+
+  await prisma.transaction.update({
     where: { 
       id,
-      userId: session.user.id // Security: ensure user owns the transaction
+      userId: session.user.id
+    },
+    data: {
+      type,
+      amount,
+      categoryId,
+      date,
+      note,
+      currency,
+      debtorName,
+      location,
     }
   })
 
   revalidatePath("/")
   revalidatePath("/analytics")
   revalidatePath("/transactions")
+  redirect("/transactions")
+}
+
+export async function deleteTransaction(formData: FormData) {
+  const id = formData.get("id") as string
+  console.log("Starting deleteTransaction for ID:", id)
+  const session = await auth()
+  if (!session?.user?.id) {
+    console.error("Delete failed: No session")
+    throw new Error("Brak autoryzacji")
+  }
+
+  try {
+    const deleted = await prisma.transaction.delete({
+      where: { 
+        id,
+        userId: session.user.id
+      }
+    })
+    console.log("Successfully deleted transaction:", deleted.id)
+    
+    revalidatePath("/")
+    revalidatePath("/analytics")
+    revalidatePath("/transactions")
+    console.log("Revalidated paths. Redirecting to /transactions")
+    redirect("/transactions")
+  } catch (error) {
+    if (isRedirectError(error)) throw error
+    console.error("Error in deleteTransaction:", error)
+    throw error
+  }
 }
 
 

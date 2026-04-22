@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createTransaction } from "@/app/actions/transaction"
+import { createTransaction, updateTransaction } from "@/app/actions/transaction"
 import { createCategory } from "@/app/actions/category"
-import { Category } from "@prisma/client"
+import { Category, Transaction } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import Tesseract from "tesseract.js"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,18 +11,26 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export default function TransactionForm({ type, categories }: { type: "INCOME" | "EXPENSE", categories: Category[] }) {
+export default function TransactionForm({ 
+  type, 
+  categories, 
+  initialData 
+}: { 
+  type: "INCOME" | "EXPENSE", 
+  categories: Category[],
+  initialData?: Transaction
+}) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [currency, setCurrency] = useState("PLN")
+  const [currency, setCurrency] = useState(initialData?.currency || "PLN")
   const [exchangeRate, setExchangeRate] = useState<number | null>(null)
-  const [amountInput, setAmountInput] = useState("")
-  const [dateInput, setDateInput] = useState(new Date().toISOString().slice(0, 16))
+  const [amountInput, setAmountInput] = useState(initialData?.amount.toString() || "")
+  const [dateInput, setDateInput] = useState(initialData ? new Date(initialData.date).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16))
   const [ocrLoading, setOcrLoading] = useState(false)
   const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
   const [newCatName, setNewCatName] = useState("")
   const [localCategories, setLocalCategories] = useState(categories)
-  const [selectedCategoryId, setSelectedCategoryId] = useState("")
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialData?.categoryId || "")
 
   const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -141,7 +149,11 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
       formData.append("type", type)
       formData.set("categoryId", selectedCategoryId)
       
-      await createTransaction(formData)
+      if (initialData) {
+        await updateTransaction(initialData.id, formData)
+      } else {
+        await createTransaction(formData)
+      }
       router.push("/transactions")
       router.refresh()
     } catch (err) {
@@ -156,9 +168,13 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl mb-32">
       <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-bold tracking-tight">
-          {type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}
+          {initialData 
+            ? `Edytuj ${type === "INCOME" ? "Przychód" : "Wydatek"}` 
+            : (type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek")}
         </CardTitle>
-        <CardDescription>Uzupełnij dane lub pozwól AI zeskanować Twój paragon.</CardDescription>
+        <CardDescription>
+          {initialData ? "Zmień szczegóły swojej transakcji." : "Uzupełnij dane lub pozwól AI zeskanować Twój paragon."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -292,7 +308,7 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
                 className="w-full h-12 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20" 
                 disabled={loading || (selectedCategoryId === "NEW" || !selectedCategoryId)}
               >
-                {loading ? "Zapisywanie..." : "Dodaj transakcję"}
+                {loading ? "Zapisywanie..." : (initialData ? "Zapisz zmiany" : "Dodaj transakcję")}
               </Button>
             </div>
           </div>

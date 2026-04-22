@@ -79,7 +79,7 @@ model Category {
   color           String?         @default("#3b82f6")
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  parent          Category?       @relation("SubCategories", fields: [parentId], references: [id])
+  parent          Category?       @relation("SubCategories", fields: [parentId], references: [id], onDelete: Cascade)
   children        Category[]      @relation("SubCategories")
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions    Transaction[]
@@ -105,7 +105,7 @@ model Transaction {
   debtorName String?
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
-  category   Category        @relation(fields: [categoryId], references: [id])
+  category   Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   wallet     Wallet          @relation(fields: [walletId], references: [id])
 }

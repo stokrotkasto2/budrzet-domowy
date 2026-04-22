@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { createCategory, deleteCategory } from "@/app/actions/category"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -81,10 +82,17 @@ export default async function CategoriesSettings() {
                   <li key={cat.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-background/50 p-3 rounded-lg border border-border/50">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full border border-border/50" style={{ backgroundColor: cat.color || "#3b82f6" }} />
-                      <span className="font-semibold">{cat.name} </span>
-                      <span className="text-xs uppercase px-2 py-1 bg-muted rounded-full ml-2">
-                        {cat.type === "INCOME" ? "Przychód" : "Wydatek"}
-                      </span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{cat.name} </span>
+                          <Link href={`/categories/${cat.id}`} className="text-xs text-primary hover:underline font-medium">
+                            (Zobacz szczegóły)
+                          </Link>
+                        </div>
+                        <span className="text-[10px] uppercase w-fit px-2 py-0.5 bg-muted rounded-full mt-1">
+                          {cat.type === "INCOME" ? "Przychód" : "Wydatek"}
+                        </span>
+                      </div>
                       {cat.budgetLimit && (
                         <p className="text-sm text-muted-foreground mt-1">
                           Limit: {cat.budgetLimit} {cat.budgetLimitType === "PERCENTAGE" ? "%" : "PLN"}

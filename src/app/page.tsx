@@ -16,6 +16,7 @@ export default async function Dashboard() {
   const transactions = await prisma.transaction.findMany({
     where: { userId },
     orderBy: { date: 'desc' },
+    include: { category: true },
     take: 5
   })
 
@@ -170,22 +171,29 @@ export default async function Dashboard() {
                 {transactions.map((t) => {
                   const isExpense = t.type === 'EXPENSE';
                   return (
-                    <div key={t.id} className="flex items-center justify-between border-b border-border/50 last:border-0 pb-4 last:pb-0">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${isExpense ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-500"}`}>
-                          {isExpense ? "📉" : "📈"}
+                    <Link key={t.id} href={`/transactions/${t.id}`} className="block group">
+                      <div className="flex items-center justify-between border-b border-border/50 last:border-0 pb-4 last:pb-0 hover:bg-primary/5 transition-colors p-2 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-full ${isExpense ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-500"}`}>
+                            {isExpense ? "📉" : "📈"}
+                          </div>
+                          <div>
+                            <p className="font-semibold group-hover:text-primary transition-colors">{t.note || (isExpense ? "Wydatek" : "Przychód")}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {t.date.toLocaleDateString("pl-PL", { hour: '2-digit', minute: '2-digit' })} • {t.currency} • 
+                              {t.category && (
+                                <span className="hover:underline text-primary/70 font-medium ml-1">
+                                  {t.category.name}
+                                </span>
+                              )}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold">{t.note || (isExpense ? "Wydatek" : "Przychód")}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {t.date.toLocaleDateString("pl-PL", { hour: '2-digit', minute: '2-digit' })} • {t.currency}
-                          </p>
+                        <div className={`font-bold ${isExpense ? "" : "text-emerald-500"}`}>
+                          {isExpense ? "-" : "+"}{t.amount.toFixed(2)} PLN
                         </div>
                       </div>
-                      <div className={`font-bold ${isExpense ? "" : "text-emerald-500"}`}>
-                        {isExpense ? "-" : "+"}{t.amount.toFixed(2)} PLN
-                      </div>
-                    </div>
+                    </Link>
                   )
                 })}
               </div>
