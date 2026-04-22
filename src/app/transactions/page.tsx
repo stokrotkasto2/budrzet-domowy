@@ -78,10 +78,7 @@ export default async function TransactionsPage() {
                                             {t.type === 'INCOME' ? "+" : "-"}{t.amount.toFixed(2)} {t.currency}
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <form action={async () => { 
-                                                "use server"
-                                                await deleteTransaction(t.id) 
-                                            }}>
+                                            <form action={deleteTransaction.bind(null, t.id)}>
                                                 <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10">Usuń</Button>
                                             </form>
                                         </td>
@@ -92,6 +89,14 @@ export default async function TransactionsPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            <div className="mt-8 flex justify-center">
+                <Link href="/transactions/new/expense">
+                    <Button size="lg" className="rounded-full px-8 shadow-lg shadow-primary/20">
+                        + Dodaj transakcję
+                    </Button>
+                </Link>
+            </div>
         </main>
     </div>
   )

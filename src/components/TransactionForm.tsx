@@ -21,6 +21,8 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   const [ocrLoading, setOcrLoading] = useState(false)
   const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
   const [newCatName, setNewCatName] = useState("")
+  const [localCategories, setLocalCategories] = useState(categories)
+  const [selectedCategoryId, setSelectedCategoryId] = useState("")
 
   const handleReceiptChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,17 +30,14 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
 
     setOcrLoading(true);
     try {
-      // Wywołanie sztucznej inteligencji OCR
       const result = await Tesseract.recognize(file, 'pol');
       const text = result.data.text.toUpperCase();
       
-      // Proba wyciagniecia sumy (np. SUMA, PLN, RAZEM XXX.XX)
       const amountRegex = /(?:SUMA|RAZEM|PLN).*?(\d+[.,]\d{2})/;
       const matchAmount = text.match(amountRegex);
       if (matchAmount) {
         setAmountInput(matchAmount[1].replace(',', '.'));
       } else {
-        // Fallback: znajdz najwieksza liczbe zmiennoprzecinkowa
         const allNums = text.match(/\d+[.,]\d{2}/g);
         if (allNums) {
            const max = Math.max(...allNums.map(n => parseFloat(n.replace(',','.'))));
@@ -46,7 +45,6 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
         }
       }
 
-      // Proba wyciagniecia daty np. YYYY-MM-DD
       const dateRegex = /(\d{4}-\d{2}-\d{2})/;
       const matchDate = text.match(dateRegex);
       if (matchDate) {
@@ -81,10 +79,6 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     return (parseFloat(amountInput) * exchangeRate).toFixed(2)
   }
 
-  // Stan dla dynamicznej listy kategorii
-  const [localCategories, setLocalCategories] = useState(categories)
-  const [selectedCategoryId, setSelectedCategoryId] = useState("")
-
   const handleAddNewCategory = async () => {
     if (!newCatName) return
     setLoading(true)
@@ -92,11 +86,10 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
       const formData = new FormData()
       formData.append("name", newCatName)
       formData.append("type", type)
-      formData.append("color", "#3b82f6") // Domyslny niebieski
+      formData.append("color", "#3b82f6")
       
       const res = await createCategory(formData)
       if (res && res.id) {
-        // Dodaj do lokalnej listy i zaznacz
         setLocalCategories([...localCategories, res])
         setSelectedCategoryId(res.id)
         setShowNewCategoryForm(false)
@@ -117,10 +110,11 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
     try {
       const formData = new FormData(e.currentTarget)
       formData.append("type", type)
-      // Upewnij sie ze bierzemy wybrana kategorie (rowniez te nowo dodana)
       formData.set("categoryId", selectedCategoryId)
       
       await createTransaction(formData)
+      router.push("/transactions")
+      router.refresh()
     } catch (err) {
       console.error(err)
       alert("Wystąpił błąd.")
@@ -130,19 +124,12 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
   }
 
   return (
-<<<<<<< HEAD
-    <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl">
+    <Card className="w-full max-w-lg mx-auto bg-card/60 backdrop-blur-xl border-border/40 shadow-2xl mt-4 sm:mt-8 overflow-hidden rounded-3xl mb-24">
       <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-bold tracking-tight">
           {type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}
         </CardTitle>
         <CardDescription>Uzupełnij dane lub pozwól AI zeskanować Twój paragon.</CardDescription>
-=======
-    <Card className="w-full max-w-lg mx-auto bg-card/40 backdrop-blur-md border-border/50 shadow-xl mt-8">
-      <CardHeader>
-        <CardTitle>{type === "INCOME" ? "Dodaj Przychód" : "Nowy Wydatek"}</CardTitle>
-        <CardDescription>Wypełnij dane, aby dodać transakcję do budżetu.</CardDescription>
->>>>>>> parent of fd0a23c (Poprawa OCR i przebudowa formularza transakcji (Mobile-First))
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -162,7 +149,13 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Waluta</Label>
-              <select name="currency" id="currency" className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background" value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              <select 
+                name="currency" 
+                id="currency" 
+                className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background" 
+                value={currency} 
+                onChange={(e) => setCurrency(e.target.value)}
+              >
                 <option value="PLN">PLN - Złoty</option>
                 <option value="EUR">EUR - Euro</option>
                 <option value="USD">USD - Dolar sz</option>
@@ -178,7 +171,6 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
           )}
 
           <div className="space-y-2">
-<<<<<<< HEAD
             <Label htmlFor="categoryId" className="font-semibold px-1">Kategoria</Label>
             <select 
               name="categoryId" 
@@ -195,10 +187,6 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
                 }
               }}
             >
-=======
-            <Label htmlFor="categoryId">Kategoria</Label>
-            <select name="categoryId" id="categoryId" className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm" required>
->>>>>>> parent of fd0a23c (Poprawa OCR i przebudowa formularza transakcji (Mobile-First))
               <option value="">Wybierz kategorię...</option>
               {localCategories.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -238,22 +226,6 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
             <Input id="note" name="note" placeholder="Za co to było..." />
           </div>
 
-<<<<<<< HEAD
-          <div className="flex gap-4 pt-2">
-            <Button 
-              type="submit" 
-              className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]" 
-              disabled={loading || selectedCategoryId === "NEW" || !selectedCategoryId}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin"></div>
-                  <span>Zapisywanie...</span>
-                </div>
-              ) : (
-                "DODAJ TRANSAKCJĘ"
-              )}
-=======
           <div className="space-y-2">
             <Label htmlFor="location">Lokalizacja</Label>
             <Input id="location" name="location" placeholder="np. Sklep Biedronka" />
@@ -275,14 +247,25 @@ export default function TransactionForm({ type, categories }: { type: "INCOME" |
             </div>
           )}
 
-          <div className="flex gap-4 pt-4">
-            <Button type="button" variant="outline" className="w-full" onClick={() => router.back()}>
+          <div className="flex gap-4 pt-4 sm:relative">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full rounded-2xl h-12" 
+              onClick={() => router.back()}
+            >
               Anuluj
             </Button>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Zapisywanie..." : "Zapisz transakcję"}
->>>>>>> parent of fd0a23c (Poprawa OCR i przebudowa formularza transakcji (Mobile-First))
-            </Button>
+            
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border/50 sm:relative sm:p-0 sm:bg-transparent sm:border-0 z-[100]">
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20" 
+                disabled={loading || (selectedCategoryId === "NEW" || !selectedCategoryId)}
+              >
+                {loading ? "Zapisywanie..." : "Dodaj transakcję"}
+              </Button>
+            </div>
           </div>
         </form>
       </CardContent>
