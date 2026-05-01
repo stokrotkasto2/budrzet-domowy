@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { deleteTransaction } from "@/app/actions/transaction"
 import { Calendar, MapPin, Notebook, User, Tag, Pencil, Trash2 } from "lucide-react"
+import SettledCheckbox from "@/components/SettledCheckbox"
 
 export default async function TransactionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -106,6 +107,16 @@ export default async function TransactionDetailsPage({ params }: { params: Promi
                                 <p className="font-semibold">{isExpense ? "Wydatek" : "Przychód"}</p>
                             </div>
                         </div>
+
+                        {transaction.category?.name.toLowerCase().includes("pożyczone") || transaction.category?.name.toLowerCase().includes("pozyczone") ? (
+                            <div className="mt-4">
+                                <SettledCheckbox 
+                                    id={transaction.id} 
+                                    initialIsSettled={transaction.isSettled} 
+                                    isExpense={isExpense} 
+                                />
+                            </div>
+                        ) : null}
                     </div>
 
                     {transaction.receiptUrl && (

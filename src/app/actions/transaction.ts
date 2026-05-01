@@ -156,3 +156,23 @@ export async function fetchCategories(type: "INCOME" | "EXPENSE") {
 
   return categories
 }
+
+export async function toggleTransactionSettled(id: string, isSettled: boolean) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("Brak autoryzacji")
+
+  await prisma.transaction.update({
+    where: { 
+      id,
+      userId: session.user.id
+    },
+    data: {
+      isSettled
+    }
+  })
+
+  revalidatePath(`/transactions/${id}`)
+  revalidatePath("/transactions")
+  revalidatePath("/analytics")
+  revalidatePath("/analytics/report")
+}

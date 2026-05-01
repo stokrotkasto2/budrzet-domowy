@@ -27,11 +27,33 @@ export default async function ReportPage() {
   type CatStat = { name: string, amount: number, limit: number | null, isPercent: boolean }
   const catMap: Record<string, CatStat> = {}
 
+  let lentTotal = 0;
+  let lentSettled = 0;
+  let lentUnsettled = 0;
+
+  let borrowedTotal = 0;
+  let borrowedSettled = 0;
+  let borrowedUnsettled = 0;
+
   monthTxs.forEach(t => {
-    if (t.type === 'INCOME') income += t.amount
-    else {
+    const cName = t.category?.name || "Inne"
+    const isPozyczone = cName.toLowerCase().includes("pożyczone") || cName.toLowerCase().includes("pozyczone");
+
+    if (t.type === 'INCOME') {
+      income += t.amount
+      if (isPozyczone) {
+        borrowedTotal += t.amount
+        if (t.isSettled) borrowedSettled += t.amount
+        else borrowedUnsettled += t.amount
+      }
+    } else {
       expense += t.amount
-      const cName = t.category?.name || "Inne"
+      if (isPozyczone) {
+        lentTotal += t.amount
+        if (t.isSettled) lentSettled += t.amount
+        else lentUnsettled += t.amount
+      }
+
       if (!catMap[cName]) {
         catMap[cName] = { 
           name: cName, 
@@ -85,6 +107,48 @@ export default async function ReportPage() {
             <p className="text-3xl font-bold text-red-700">-{expense.toFixed(2)} PLN</p>
           </div>
         </div>
+
+        {(lentTotal > 0 || borrowedTotal > 0) && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold border-b border-gray-300 pb-2 mb-4">Raport Pożyczek</h2>
+            <div className="grid grid-cols-2 gap-8">
+              {lentTotal > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h3 className="text-gray-600 font-semibold mb-3">Pieniądze pożyczone innym (Wydatki)</h3>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-500">Razem pożyczono:</span>
+                    <span className="font-bold">{lentTotal.toFixed(2)} PLN</span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-1 text-green-600">
+                    <span>Zwrócono Ci (Odzyskane):</span>
+                    <span className="font-bold">{lentSettled.toFixed(2)} PLN</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-red-600 mt-2 pt-2 border-t border-gray-200">
+                    <span>Nadal do oddania (Dług u Ciebie):</span>
+                    <span className="font-bold">{lentUnsettled.toFixed(2)} PLN</span>
+                  </div>
+                </div>
+              )}
+              {borrowedTotal > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h3 className="text-gray-600 font-semibold mb-3">Pieniądze pożyczone od innych (Przychody)</h3>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-500">Razem pożyczyłeś:</span>
+                    <span className="font-bold">{borrowedTotal.toFixed(2)} PLN</span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-1 text-green-600">
+                    <span>Oddałeś (Spłacone):</span>
+                    <span className="font-bold">{borrowedSettled.toFixed(2)} PLN</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-red-600 mt-2 pt-2 border-t border-gray-200">
+                    <span>Nadal zalegasz (Twój dług):</span>
+                    <span className="font-bold">{borrowedUnsettled.toFixed(2)} PLN</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mb-8">
           <h2 className="text-2xl font-bold border-b border-gray-300 pb-2 mb-4">Wydatki wg Kategorii</h2>

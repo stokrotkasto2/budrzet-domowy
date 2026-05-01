@@ -159,7 +159,14 @@ export default async function AnalysisPage() {
                                   {t.date.toLocaleDateString("pl-PL")} {t.location ? `• ${t.location}` : ""}
                                 </span>
                               </div>
-                              <span className="font-medium">-{t.amount.toFixed(2)}</span>
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium">-{t.amount.toFixed(2)}</span>
+                                {(t.category?.name.toLowerCase().includes('pozyczone') || t.category?.name.toLowerCase().includes('pożyczone')) && (
+                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.isSettled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {t.isSettled ? "✅ Odzyskane" : "⏳ Czeka"}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -198,7 +205,14 @@ export default async function AnalysisPage() {
                                   {t.date.toLocaleDateString("pl-PL")}
                                 </span>
                               </div>
-                              <span className="font-medium">+{t.amount.toFixed(2)}</span>
+                              <div className="flex flex-col items-end">
+                                <span className="font-medium">+{t.amount.toFixed(2)}</span>
+                                {(t.category?.name.toLowerCase().includes('pozyczone') || t.category?.name.toLowerCase().includes('pożyczone')) && (
+                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.isSettled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {t.isSettled ? "✅ Spłacone" : "⏳ Dług"}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>

@@ -103,6 +103,7 @@ model Transaction {
   receiptUrl String?
   currency   String          @default("PLN")
   debtorName String?
+  isSettled  Boolean         @default(false)
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
   category   Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
