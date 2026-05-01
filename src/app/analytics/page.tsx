@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,8 +29,7 @@ export default async function AnalysisPage({ searchParams }: { searchParams: Pro
     startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const whereClause: any = { userId: session.user.id };
+  const whereClause: Prisma.TransactionWhereInput = { userId: session.user.id };
   if (startDate) {
     whereClause.date = { gte: startDate };
   }

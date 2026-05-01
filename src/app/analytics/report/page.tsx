@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import PrintButton from "@/components/PrintButton"
 
 const prisma = new PrismaClient()
 
@@ -76,11 +77,7 @@ export default async function ReportPage() {
         </Link>
         <div className="flex items-center gap-4">
           <p className="text-muted-foreground text-sm">Wciśnij CTRL+P lub przycisk, aby wyeksportować do PDF.</p>
-          <Button onClick={() => { /* Client component wrapper would be better, but we do classic script */ }} className="bg-primary text-primary-foreground">
-            <label htmlFor="druk" className="cursor-pointer" onClick={(e) => { e.preventDefault(); if (typeof window !== 'undefined') window.print(); }}>
-               Drukuj / Zapisz PDF
-            </label>
-          </Button>
+          <PrintButton />
         </div>
       </div>
 
