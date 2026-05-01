@@ -6,12 +6,36 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import AnalysisChart from "@/components/AnalysisChart"
 
-export default async function AnalysisPage() {
+export default async function AnalysisPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const session = await auth()
   if (!session?.user?.id) return redirect("/login")
 
+  const { period = 'all' } = await searchParams;
+
+  let startDate: Date | undefined;
+  const now = new Date();
+  
+  if (period === 'year') {
+    startDate = new Date(now.getFullYear(), 0, 1);
+  } else if (period === 'month') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  } else if (period === 'week') {
+    startDate = new Date(now);
+    const day = startDate.getDay() || 7; 
+    if (day !== 1) startDate.setHours(-24 * (day - 1));
+    startDate.setHours(0, 0, 0, 0);
+  } else if (period === 'day') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const whereClause: any = { userId: session.user.id };
+  if (startDate) {
+    whereClause.date = { gte: startDate };
+  }
+
   const transactions = await prisma.transaction.findMany({
-    where: { userId: session.user.id },
+    where: whereClause,
     include: { category: true }
   })
 
@@ -76,6 +100,14 @@ export default async function AnalysisPage() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
+
+        <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+          <Link href="/analytics?period=all"><Button variant={period === 'all' ? 'default' : 'outline'} size="sm" className="rounded-full">Całościowy</Button></Link>
+          <Link href="/analytics?period=year"><Button variant={period === 'year' ? 'default' : 'outline'} size="sm" className="rounded-full">Roczny</Button></Link>
+          <Link href="/analytics?period=month"><Button variant={period === 'month' ? 'default' : 'outline'} size="sm" className="rounded-full">Miesięczny</Button></Link>
+          <Link href="/analytics?period=week"><Button variant={period === 'week' ? 'default' : 'outline'} size="sm" className="rounded-full">Tygodniowy</Button></Link>
+          <Link href="/analytics?period=day"><Button variant={period === 'day' ? 'default' : 'outline'} size="sm" className="rounded-full">Dzienny</Button></Link>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="bg-card/40 backdrop-blur-md border-emerald-500/20">
