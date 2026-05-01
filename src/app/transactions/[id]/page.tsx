@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { deleteTransaction } from "@/app/actions/transaction"
-import { Calendar, MapPin, Notebook, User, Tag, Pencil, Trash2 } from "lucide-react"
+import { Calendar, MapPin, Notebook, User, Tag, Pencil, Trash2, X } from "lucide-react"
 import SettledCheckbox from "@/components/SettledCheckbox"
 
 export default async function TransactionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +34,10 @@ export default async function TransactionDetailsPage({ params }: { params: Promi
         <TopBar title="Szczegóły transakcji" backHref="/transactions" backLabel="Historia" />
 
         <main className="container mx-auto p-4 pt-8 max-w-2xl">
-            <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-2xl overflow-hidden rounded-3xl">
+            <Card className="bg-card/40 backdrop-blur-md border-border/50 shadow-2xl overflow-hidden rounded-3xl relative">
+                <Link href="/transactions" className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors bg-background/50 backdrop-blur-sm rounded-full z-10 hover:bg-background">
+                    <X size={20} />
+                </Link>
                 <div className={`h-2 w-full ${isExpense ? "bg-destructive" : "bg-emerald-500"}`} />
                 <CardHeader className="text-center pb-8 pt-10">
                     <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-4 ${isExpense ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-500"}`}>
