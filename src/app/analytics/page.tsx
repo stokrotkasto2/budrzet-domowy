@@ -10,10 +10,10 @@ import AnalysisChart from "@/components/AnalysisChart"
 export default async function AnalysisPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const session = await auth()
   if (!session?.user?.id) return redirect("/login")
-
   const { period = 'all' } = await searchParams;
+  const userId = session.user.id;
 
-  let startDate: Date | undefined;
+  let startDate: Date | null = null;
   const now = new Date();
   
   if (period === 'year') {
@@ -21,18 +21,19 @@ export default async function AnalysisPage({ searchParams }: { searchParams: Pro
   } else if (period === 'month') {
     startDate = new Date(now.getFullYear(), now.getMonth(), 1);
   } else if (period === 'week') {
-    startDate = new Date(now);
-    const day = startDate.getDay() || 7; 
-    if (day !== 1) startDate.setHours(-24 * (day - 1));
-    startDate.setHours(0, 0, 0, 0);
+    const tempDate = new Date(now);
+    const day = tempDate.getDay() || 7; 
+    if (day !== 1) tempDate.setHours(-24 * (day - 1));
+    tempDate.setHours(0, 0, 0, 0);
+    startDate = tempDate;
   } else if (period === 'day') {
     startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }
 
-  const whereClause: Prisma.TransactionWhereInput = { userId: session.user.id };
-  if (startDate) {
-    whereClause.date = { gte: startDate };
-  }
+  const whereClause: Prisma.TransactionWhereInput = { 
+    userId: userId,
+    ...(startDate ? { date: { gte: startDate } } : {})
+  };
 
   const transactions = await prisma.transaction.findMany({
     where: whereClause,
@@ -193,7 +194,7 @@ export default async function AnalysisPage({ searchParams }: { searchParams: Pro
                               </div>
                               <div className="flex flex-col items-end">
                                 <span className="font-medium">-{t.amount.toFixed(2)}</span>
-                                {(t.category?.name.toLowerCase().includes('pozyczone') || t.category?.name.toLowerCase().includes('pożyczone')) && (
+                                {(t.category?.name?.toLowerCase()?.includes('pozyczone') || t.category?.name?.toLowerCase()?.includes('pożyczone')) && (
                                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.isSettled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                     {t.isSettled ? "✅ Odzyskane" : "⏳ Czeka"}
                                   </span>
@@ -239,7 +240,7 @@ export default async function AnalysisPage({ searchParams }: { searchParams: Pro
                               </div>
                               <div className="flex flex-col items-end">
                                 <span className="font-medium">+{t.amount.toFixed(2)}</span>
-                                {(t.category?.name.toLowerCase().includes('pozyczone') || t.category?.name.toLowerCase().includes('pożyczone')) && (
+                                {(t.category?.name?.toLowerCase()?.includes('pozyczone') || t.category?.name?.toLowerCase()?.includes('pożyczone')) && (
                                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.isSettled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                     {t.isSettled ? "✅ Spłacone" : "⏳ Dług"}
                                   </span>

@@ -111,7 +111,7 @@ export default async function TransactionDetailsPage({ params }: { params: Promi
                             </div>
                         </div>
 
-                        {transaction.category?.name.toLowerCase().includes("pożyczone") || transaction.category?.name.toLowerCase().includes("pozyczone") ? (
+                        {transaction.category?.name?.toLowerCase()?.includes("pożyczone") || transaction.category?.name?.toLowerCase()?.includes("pozyczone") ? (
                             <div className="mt-4">
                                 <SettledCheckbox 
                                     id={transaction.id} 
