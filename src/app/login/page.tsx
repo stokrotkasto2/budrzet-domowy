@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -129,7 +130,17 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Hasło</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Hasło</Label>
+                {!isRegistering && (
+                  <Link 
+                    href="/reset-password" 
+                    className="text-xs text-primary hover:underline transition-all"
+                  >
+                    Nie pamiętasz hasła?
+                  </Link>
+                )}
+              </div>
               <div className="relative">
                 <Input 
                   id="password" 
