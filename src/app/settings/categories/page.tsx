@@ -99,10 +99,7 @@ export default async function CategoriesSettings() {
                         </p>
                       )}
                     </div>
-                    <form action={async () => {
-                      "use server"
-                      await deleteCategory(cat.id)
-                    }} className="mt-2 sm:mt-0">
+                    <form action={deleteCategory.bind(null, cat.id)} className="mt-2 sm:mt-0">
                       <Button variant="destructive" size="sm" type="submit">
                         Usuń
                       </Button>

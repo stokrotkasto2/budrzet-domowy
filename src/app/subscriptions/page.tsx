@@ -100,7 +100,7 @@ export default async function SubscriptionsPage() {
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="font-bold text-lg">{s.amount.toFixed(2)} PLN</span>
-                          <form action={async () => { "use server"; await deleteSubscription(s.id) }}>
+                          <form action={deleteSubscription.bind(null, s.id)}>
                             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">Usuń</Button>
                           </form>
                         </div>

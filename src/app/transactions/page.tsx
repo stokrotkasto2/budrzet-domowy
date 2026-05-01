@@ -1,11 +1,12 @@
 import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import TopBar from "@/components/TopBar"
+import Link from "next/link"
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { deleteTransaction } from "@/app/actions/transaction"
-import Link from "next/link"
+
+import TransactionActions from "@/components/TransactionActions"
 
 export default async function TransactionsPage() {
   const session = await auth()
@@ -59,34 +60,34 @@ export default async function TransactionsPage() {
                                     </tr>
                                 )}
                                 {transactions.map((t) => (
-                                    <tr key={t.id} className="border-b border-border/30 hover:bg-muted/20 transition-colors">
-                                        <td className="px-6 py-4 text-sm">
-                                            {t.date.toLocaleDateString("pl-PL")}
+                                    <tr key={t.id} className="border-b border-border/30 hover:bg-muted/20 transition-all cursor-pointer group">
+                                        <td className="p-0">
+                                            <Link href={`/transactions/${t.id}`} className="block px-6 py-4 text-sm">
+                                                {t.date.toLocaleDateString("pl-PL")}
+                                            </Link>
+                                        </td>
+                                        <td className="p-0">
+                                            <Link href={`/transactions/${t.id}`} className="block px-6 py-4">
+                                                <span 
+                                                    className="px-2 py-1 rounded-full text-[10px] font-bold text-white shadow-sm"
+                                                    style={{ backgroundColor: t.category?.color || "#3b82f6" }}
+                                                >
+                                                    {t.category?.name || "Brak"}
+                                                </span>
+                                            </Link>
+                                        </td>
+                                        <td className="p-0">
+                                            <Link href={`/transactions/${t.id}`} className="block px-6 py-4 text-sm font-medium">
+                                                {t.note || "-"}
+                                            </Link>
+                                        </td>
+                                        <td className="p-0">
+                                            <Link href={`/transactions/${t.id}`} className={`block px-6 py-4 text-right font-bold ${t.type === 'INCOME' ? "text-emerald-500" : ""}`}>
+                                                {t.type === 'INCOME' ? "+" : "-"}{t.amount.toFixed(2)} {t.currency}
+                                            </Link>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span 
-                                                className="px-2 py-1 rounded-full text-[10px] font-bold text-white shadow-sm"
-                                                style={{ backgroundColor: t.category?.color || "#3b82f6" }}
-                                            >
-                                                {t.category?.name || "Brak"}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-medium">
-                                            {t.note || "-"}
-                                        </td>
-                                        <td className={`px-6 py-4 text-right font-bold ${t.type === 'INCOME' ? "text-emerald-500" : ""}`}>
-                                            {t.type === 'INCOME' ? "+" : "-"}{t.amount.toFixed(2)} {t.currency}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <Link href={`/transactions/${t.id}`}>
-                                                    <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10 font-bold">Szczegóły</Button>
-                                                </Link>
-                                                <form action={deleteTransaction}>
-                                                    <input type="hidden" name="id" value={t.id} />
-                                                    <Button type="submit" size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10">Usuń</Button>
-                                                </form>
-                                            </div>
+                                            <TransactionActions id={t.id} />
                                         </td>
                                     </tr>
                                 ))}

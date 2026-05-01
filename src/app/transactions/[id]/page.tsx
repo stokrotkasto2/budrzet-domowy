@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { deleteTransaction } from "@/app/actions/transaction"
-import { Calendar, MapPin, Notebook, User, CreditCard, Tag, ArrowLeft, Pencil, Trash2 } from "lucide-react"
+import { Calendar, MapPin, Notebook, User, Tag, Pencil, Trash2 } from "lucide-react"
 
 export default async function TransactionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -124,8 +124,7 @@ export default async function TransactionDetailsPage({ params }: { params: Promi
                                 Edytuj
                             </Button>
                         </Link>
-                        <form action={deleteTransaction} className="w-full">
-                            <input type="hidden" name="id" value={transaction.id} />
+                        <form action={deleteTransaction.bind(null, transaction.id)} className="w-full">
                             <Button type="submit" className="w-full h-12 rounded-2xl gap-2 font-bold text-destructive hover:bg-destructive/10" variant="ghost">
                                 <Trash2 size={18} />
                                 Usuń

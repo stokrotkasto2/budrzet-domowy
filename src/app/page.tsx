@@ -171,8 +171,8 @@ export default async function Dashboard() {
                 {transactions.map((t) => {
                   const isExpense = t.type === 'EXPENSE';
                   return (
-                    <Link key={t.id} href={`/transactions/${t.id}`} className="block group">
-                      <div className="flex items-center justify-between border-b border-border/50 last:border-0 pb-4 last:pb-0 hover:bg-primary/5 transition-colors p-2 rounded-xl">
+                    <Link key={t.id} href={`/transactions/${t.id}`} className="block group cursor-pointer">
+                      <div className="flex items-center justify-between border-b border-border/50 last:border-0 pb-4 last:pb-0 hover:bg-primary/10 transition-all p-2 rounded-xl active:scale-95 hover:scale-[1.01]">
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-full ${isExpense ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-500"}`}>
                             {isExpense ? "📉" : "📈"}

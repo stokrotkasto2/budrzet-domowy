@@ -82,8 +82,12 @@ export default function LoginPage() {
         router.push("/")
         router.refresh()
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Wystąpił nieznany błąd.")
+      }
     } finally {
       setLoading(false)
     }

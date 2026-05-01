@@ -55,7 +55,7 @@ export default async function ReportPage() {
         <div className="flex items-center gap-4">
           <p className="text-muted-foreground text-sm">Wciśnij CTRL+P lub przycisk, aby wyeksportować do PDF.</p>
           <Button onClick={() => { /* Client component wrapper would be better, but we do classic script */ }} className="bg-primary text-primary-foreground">
-            <label htmlFor="druk" className="cursor-pointer" onClick={(e) => { e.preventDefault(); typeof window !== 'undefined' && window.print() }}>
+            <label htmlFor="druk" className="cursor-pointer" onClick={(e) => { e.preventDefault(); if (typeof window !== 'undefined') window.print(); }}>
                Drukuj / Zapisz PDF
             </label>
           </Button>

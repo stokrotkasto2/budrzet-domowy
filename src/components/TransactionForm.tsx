@@ -154,8 +154,7 @@ export default function TransactionForm({
       } else {
         await createTransaction(formData)
       }
-      router.push("/transactions")
-      router.refresh()
+      // Redirection is handled by the server actions themselves
     } catch (err) {
       console.error(err)
       alert("Wystąpił błąd.")
@@ -268,19 +267,19 @@ export default function TransactionForm({
 
           <div className="space-y-2">
             <Label htmlFor="note">Notatka</Label>
-            <Input id="note" name="note" placeholder="Za co to było..." />
+            <Input id="note" name="note" defaultValue={initialData?.note || ""} placeholder="Za co to było..." />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="location">Lokalizacja</Label>
-            <Input id="location" name="location" placeholder="np. Sklep Biedronka" />
+            <Input id="location" name="location" defaultValue={initialData?.location || ""} placeholder="np. Sklep Biedronka" />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="debtorName">
                {type === "INCOME" ? "Od kogo otrzymałem? (Kto mi wisi)" : "Komu pożyczam / Wiszę"}
             </Label>
-            <Input id="debtorName" name="debtorName" placeholder="Jan Kowalski..." />
+            <Input id="debtorName" name="debtorName" defaultValue={initialData?.debtorName || ""} placeholder="Jan Kowalski..." />
           </div>
 
           {type === "EXPENSE" && (

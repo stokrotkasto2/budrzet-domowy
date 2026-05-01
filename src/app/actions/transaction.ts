@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { isRedirectError } from "next/dist/client/components/redirect"
 
 // Wykorzystujemy globalny klient prisma
 
@@ -16,7 +15,10 @@ export async function createTransaction(formData: FormData) {
   }
 
   const type = formData.get("type") as "INCOME" | "EXPENSE"
-  const amount = parseFloat(formData.get("amount") as string)
+  const amountStr = formData.get("amount") as string
+  const amount = parseFloat(amountStr.replace(',', '.'))
+
+  if (isNaN(amount)) throw new Error("Nieprawidłowa kwota")
   const categoryId = formData.get("categoryId") as string
   const dateStr = formData.get("date") as string
   const note = formData.get("note") as string
@@ -75,7 +77,10 @@ export async function updateTransaction(id: string, formData: FormData) {
   if (!session?.user?.id) throw new Error("Musisz być zalogowany")
 
   const type = formData.get("type") as "INCOME" | "EXPENSE"
-  const amount = parseFloat(formData.get("amount") as string)
+  const amountStr = formData.get("amount") as string
+  const amount = parseFloat(amountStr.replace(',', '.'))
+
+  if (isNaN(amount)) throw new Error("Nieprawidłowa kwota")
   const categoryId = formData.get("categoryId") as string
   const dateStr = formData.get("date") as string
   const note = formData.get("note") as string
@@ -108,8 +113,7 @@ export async function updateTransaction(id: string, formData: FormData) {
   redirect("/transactions")
 }
 
-export async function deleteTransaction(formData: FormData) {
-  const id = formData.get("id") as string
+export async function deleteTransaction(id: string) {
   console.log("Starting deleteTransaction for ID:", id)
   const session = await auth()
   if (!session?.user?.id) {
@@ -130,12 +134,12 @@ export async function deleteTransaction(formData: FormData) {
     revalidatePath("/analytics")
     revalidatePath("/transactions")
     console.log("Revalidated paths. Redirecting to /transactions")
-    redirect("/transactions")
   } catch (error) {
-    if (isRedirectError(error)) throw error
     console.error("Error in deleteTransaction:", error)
     throw error
   }
+  
+  redirect("/transactions")
 }
 
 

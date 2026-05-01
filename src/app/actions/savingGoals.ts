@@ -26,9 +26,15 @@ export async function createSavingGoal(formData: FormData) {
   revalidatePath("/saving-goals")
 }
 
-export async function addMoneyToGoal(goalId: string, amount: number) {
+export async function addMoneyToGoal(formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) throw new Error("Brak autoryzacji")
+
+  const goalId = formData.get("goalId") as string
+  const amountStr = formData.get("amount") as string
+  const amount = parseFloat(amountStr.replace(',', '.'))
+
+  if (isNaN(amount) || amount <= 0) throw new Error("Nieprawidłowa kwota")
 
   const goal = await prisma.savingGoal.findUnique({ where: { id: goalId } })
   if (!goal || goal.userId !== session.user.id) throw new Error("Brak dostępu")

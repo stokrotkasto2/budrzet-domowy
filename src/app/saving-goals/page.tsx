@@ -58,8 +58,8 @@ export default async function SavingGoalsPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl flex justify-between items-center">
                     {goal.name}
-                    <form action={async () => { "use server"; await deleteSavingGoal(goal.id) }}>
-                      <Button variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0 rounded-full">✕</Button>
+                    <form action={deleteSavingGoal.bind(null, goal.id)}>
+                      <Button type="submit" variant="ghost" size="sm" className="text-destructive h-6 w-6 p-0 rounded-full">✕</Button>
                     </form>
                   </CardTitle>
                   <CardDescription>
@@ -79,13 +79,10 @@ export default async function SavingGoalsPage() {
                   </div>
                   
                   {Number(percentage) < 100 && (
-                    <form action={async (formData: FormData) => {
-                      "use server"
-                      const amt = parseFloat(formData.get("addAmount") as string)
-                      if (!isNaN(amt)) await addMoneyToGoal(goal.id, amt)
-                    }} className="flex gap-2">
-                      <Input name="addAmount" type="number" step="0.01" placeholder="+ kwota" className="h-8 text-sm" required />
-                      <Button size="sm" className="h-8">Wpłać</Button>
+                    <form action={addMoneyToGoal} className="flex gap-2">
+                      <input type="hidden" name="goalId" value={goal.id} />
+                      <Input name="amount" type="number" step="0.01" placeholder="+ kwota" className="h-8 text-sm" required />
+                      <Button type="submit" size="sm" className="h-8">Wpłać</Button>
                     </form>
                   )}
                 </CardContent>

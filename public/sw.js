@@ -1,4 +1,4 @@
-const CACHE_NAME = 'budzet-domowy-v2';
+const CACHE_NAME = 'budzet-domowy-v3';
 const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/icon-192x192.png',

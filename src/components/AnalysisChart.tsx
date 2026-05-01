@@ -38,15 +38,17 @@ export default function AnalysisChart({ data, title }: { data: ChartData[], titl
                 borderRadius: '12px' 
               }}
               itemStyle={{ color: '#fff' }}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any) => [`${parseFloat(value).toFixed(2)} PLN`, 'Kwota']}
             />
             <Legend 
               verticalAlign="bottom" 
               height={36}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value, entry: any) => {
                 const total = data.reduce((acc, curr) => acc + curr.value, 0);
                 const percent = ((entry.payload.value / total) * 100).toFixed(1);
-                return <span className="text-sm font-medium text-muted-foreground">{value} ({percent}%)</span>;
+                return <span className="text-sm font-medium text-muted-foreground">{value as string} ({percent}%)</span>;
               }}
             />
           </PieChart>
