@@ -1,56 +1,65 @@
-# budrzet-domowy
+# 🌼 Budżet Domowy (Home Budget)
 
-aplikacja do budżetu domowego
-stwórz do tego tez baze danych w dockerze z tymi danymi : logowanie, hasla ,konta, transakcje, kategorie transakcji i wszytskimi rzeczami w aplikacji- zeby po zalogowaniu si ez innego urzadzenia miec dostep do swoich danych
+Profesjonalna aplikacja do zarządzania finansami domowymi, stworzona w Next.js. Aplikacja pozwala na śledzenie wydatków, przychodów, planowanie oszczędności oraz monitorowanie limitów budżetowych.
 
-## wazne
-zrób to jako aplikacje desktopową i mobilną w jednej aplikacji zaleznie od urządzenia na którym jest uruchomiona aplikacja okraz stórz baze dachy w dockerze zeby latwo bylo ja uruchomic na kazdym komputerze
+## ✨ Główne Funkcje
 
-## funkcje
-- logowanie i rejestracja kazdego uzytkownika 
-    - przycisk zaloguj
-        - podaj email i haslo
-        - mozliwosc logowania z kontem google
-    - przycisk zarejestruj
-        - podaj email i haslo, powtórz haslo
-        - mozliwosc rejestracji z kontem google
+- **🔐 Bezpieczeństwo:**
+  - Logowanie i rejestracja (w tym integracja z Google).
+  - System odzyskiwania hasła za pomocą kodu wysyłanego na email.
+  - Szyfrowanie haseł (bcrypt).
 
-- dodawanie wyplaty i wyswietlenie łącznej puli moich srodkow na samej gorze aplikacji 
-    - Pełne zarządzanie (dodawanie, edycja, usuwanie) wydatkami i przychodami.
-    - przycisk dodaj wydatek (mozliwosc tworzenia kategori wydatków np. zakupy, jedzenie, transport, rozrywka, itp- zzeby to tez mozna było edytowac te kategorie)
+- **💰 Zarządzanie Finansami:**
+  - Dodawanie przychodów i wydatków z kategoryzacją.
+  - Obsługa podkategorii, notatek, lokalizacji i dat.
+  - Skanowanie paragonów (OCR) oraz załączanie zdjęć (symulacja).
+  - **Pożyczki:** Śledzenie komu wisimy pieniądze i kto wiszą nam, z oznaczeniem statusu spłaty.
 
-        - podczas korzystania z telefony zapytaj o pozwolenie na korzystanie z kamery aparatu i skanuj paragon ale nie musisz go dodawac ze wszystkim co sie kupiło tylko zapisuj samą kwote dla ułatwienia zapisywania wydatków
-        - dodaj tez opcje recznego wpisywania kwoty
-        - dodaj tez opcje dodawania podkategorii
-        - dodaj tez opcje dodawania notatek przy wydatkach
-        - dodaj tez opcje dodawania daty i godziny wydatku
-        - dodaj tez opcje dodawania miejsca wydatku
-        - dodaj tez opcje dodawania zdjecia paragonu
-        - dodaj tez opcje dodawania kto mi wisi pieniadze z mozliwoscia wypisania imienia i kwoty oraz komu ja wisze tą daną kwote z imieniem i kwota
+- **📊 Analiza i Raporty:**
+  - Interaktywne wykresy wydatków i przychodów.
+  - Filtrowanie danych według okresów (Dzień, Tydzień, Miesiąc, Rok, Całość).
+  - Eksport szczegółowego raportu do formatu PDF (widok druku).
 
-    - przycisk dodaj przychod
-        - dodaj tez opcje recznego wpisywania kwoty
-        - dodaj tez opcje dodawania podkategorii
-        - dodaj tez opcje dodawania notatek przy przychodach
-        - dodaj tez opcje dodawania daty i godziny przychodu
-        - dodaj tez opcje dodawania miejsca przychodu
-        - dodaj tez opcje dodawania zdjecia paragonu
-        - dodaj tez opcje dodawania imienia od kodo mam te pieniadze i jaka to kwota i za co
+- **🎯 Cele i Subskrypcje:**
+  - **Skarbonki:** Zarządzanie celami oszczędnościowymi.
+  - **Subskrypcje:** Śledzenie stałych, miesięcznych opłat.
+  - **Limity:** Ustawianie miesięcznych limitów wydatków na poszczególne kategorie (kwotowo lub procentowo).
 
-- kategoryzacja transakcji w ustawieniach daj mozliwosc dodawania i usuwania kategorii i podkategorii, kazda transakcja musi miec przypisana kategorie oraz zrób tak zeby w ustawieniach dalo sie tez do kazdej kategori dac limit wydatkow na dany miesiac jako konkretna kwojta badz procent z całej puli moich srodkow lub procent od moich miesiecznych przychodów (zapisanych jako wyplata)
-- 
+- **💎 Estetyka:**
+  - Nowoczesny Dark Mode z delikatnym wzorem stokrotek.
+  - Responsywny design (Mobile & Desktop).
+  - Szklane efekty (glassmorphism) i płynne animacje.
 
-- opcja analiza finansowa czyli wykresy miesieczne i  roczne itp
+## 🛠️ Technologie
 
-- dodaj tez mozliwosc dodawania wydatków na wakacjach w innych walutach (np. euro, dolar, funt itp) i obok kwoty mniejszą czcionką napisz przeliczenie tej kwoty na zlotowki po aktualnym kursie waluty
+- **Frontend:** Next.js 15+, Tailwind CSS 4, Lucide React, Recharts.
+- **Backend:** Next.js Server Actions, NextAuth.js (v5).
+- **Baza danych:** PostgreSQL (NeonDB), Prisma ORM.
+- **Email:** Resend (do wysyłki kodów resetujących).
 
-## wizualnie
-- tryb ciemny czyli czarno, biała, ciemno zielona kolorystyka
-w ciemnym tle dodaj małe białe stokrotki jako delikatny wzór tła
+## 🚀 Uruchomienie lokalne
 
-## inne
- w kazdym etapie rób commity
+1. Sklonuj repozytorium.
+2. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+3. Skonfiguruj plik `.env`:
+   - `DATABASE_URL` (PostgreSQL)
+   - `AUTH_SECRET` (Generowany np. przez `npx auth secret`)
+   - `RESEND_API_KEY` (z panelu Resend)
+4. Zainicjalizuj bazę danych:
+   ```bash
+   npx prisma db push
+   ```
+5. Uruchom serwer deweloperski:
+   ```bash
+   npm run dev
+   ```
 
-## technologia
-- next.js
-- i baze dazych w dockerze
+## 🐳 Docker
+
+Aplikacja jest przystosowana do pracy z kontenerami, co ułatwia synchronizację bazy danych i środowiska.
+
+---
+*Projekt stworzony z dbałością o detale i wygodę użytkownika.*
